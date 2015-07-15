@@ -20,7 +20,13 @@ android {
 }
 
 dependencies {
+
+    repositories {
+        mavenCentral()
+    }
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
 }
