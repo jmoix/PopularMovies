@@ -42,5 +42,9 @@ public class MoviesContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildMovieLocationWithId(long id){
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+
     }
 }

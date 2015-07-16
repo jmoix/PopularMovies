@@ -19,7 +19,7 @@ public class MoviesProvider extends ContentProvider {
     public static final int MOVIES = 100;
     public static final int MOVIE = 101;
 
-    static UriMatcher buildUriMatcher(){
+    public static UriMatcher buildUriMatcher(){
 
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MoviesContract.CONTENT_AUTHORITY;
