@@ -9,6 +9,7 @@
     <!-- urls -->
     <string name="base_moviedb_url">http://api.themoviedb.org/3/discover/movie</string>
     <string name="base_movieposter_url">http://image.tmdb.org/t/p/w185<xliff:g id="movie_id">%1$s</xliff:g></string>
+    <string name="base_moviebackdrop_url">http://image.tmdb.org/t/p/w780<xliff:g id="movie_id">%1$s</xliff:g></string>
 
     <!-- url headers -->
     <string name="url_sortBy_key">sort_by</string>

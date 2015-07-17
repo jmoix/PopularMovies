@@ -1,14 +1,19 @@
 package com.jasonmoix.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.jasonmoix.popularmovies.sync.FetchMovieTask;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements MovieListingFragment.Callback {
@@ -21,17 +26,14 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Uri movieDbUri = Uri.parse(getString(R.string.base_moviedb_url)).buildUpon()
-                .appendQueryParameter(getString(R.string.url_sortBy_key), getString(R.string.url_sortBy_value))
-                .appendQueryParameter(getString(R.string.url_api_key_key), getString(R.string.url_api_key_value))
-                .build();
-
-        Log.d("Popular Movies", getString(R.string.base_movieposter_url, "stuff"));
-        Log.d("Popular Movies", movieDbUri.toString());
-
         new FetchMovieTask(this).execute();
 
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(getString(R.string.app_name));
+
         if(findViewById(R.id.movie_detail_container) != null){
 
             mTwoPane = true;
@@ -69,7 +71,18 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         return true;
     }
 
-    public void onItemSelected(){
+    public void onItemSelected(ArrayList<String> arguments){
+
+        Intent i = new Intent(this, DetailActivity.class);
+        i.putExtra(MoviesContract.MovieEntry._ID, MovieListingFragment.COL_ID);
+        i.putExtra(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, arguments.get(MovieListingFragment.COL_BACKDROP_URL));
+        i.putExtra(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, arguments.get(MovieListingFragment.COL_POSTER_URL));
+        i.putExtra(MoviesContract.MovieEntry.COLUMN_TITLE, arguments.get(MovieListingFragment.COL_TITLE));
+        i.putExtra(MoviesContract.MovieEntry.COLUMN_OVERVIEW, arguments.get(MovieListingFragment.COL_OVERVIEW));
+        i.putExtra(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, arguments.get(MovieListingFragment.COL_VOTE));
+        i.putExtra(MoviesContract.MovieEntry.COLUMN_POPULARITY, arguments.get(MovieListingFragment.COL_POPULARITY));
+        i.putExtra(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, arguments.get(MovieListingFragment.COL_RELEASE_DATE));
+        startActivity(i);
 
     }
 

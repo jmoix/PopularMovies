@@ -24,6 +24,7 @@ public class MovieListingAdapter extends CursorAdapter {
         Picasso.with(context).load(
                 context.getString(R.string.base_movieposter_url,
                         cursor.getString(MovieListingFragment.COL_POSTER_URL)))
+                .fit()
                 .into(viewHolder.poster);
 
     }

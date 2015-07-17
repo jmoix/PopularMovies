@@ -11,13 +11,17 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
+
+import java.util.ArrayList;
 
 /**
  * Created by jmoix on 7/15/2015.
@@ -31,10 +35,17 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     private static final int MOVIE_LOADER = 0;
     private static final String SELECTED_KEY = "selected_position";
 
+    static final int COL_ID = 0;
+    static final int COL_BACKDROP_URL = 1;
     static final int COL_POSTER_URL = 2;
+    static final int COL_TITLE = 3;
+    static final int COL_OVERVIEW = 4;
+    static final int COL_VOTE = 5;
+    static final int COL_POPULARITY = 6;
+    static final int COL_RELEASE_DATE = 7;
 
     public interface Callback {
-        void onItemSelected();
+        void onItemSelected(ArrayList<String> arguments);
     }
 
     @Override
@@ -52,6 +63,26 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
         View view = inflater.inflate(R.layout.fragment_movie_listing, container, false);
         mGridView = (GridView)view.findViewById(R.id.gridview_movies);
         mGridView.setAdapter(movieListingAdapter);
+        mGridView.setClickable(true);
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Cursor cursor = (Cursor)parent.getItemAtPosition(position);
+                if(cursor != null){
+
+                    cursor.moveToPosition(position);
+
+                    ArrayList<String> movieInfo = new ArrayList<>();
+                    for(int i = 0; i < cursor.getColumnCount(); i++){
+                        movieInfo.add(cursor.getString(i));
+                    }
+
+                    ((Callback)getActivity()).onItemSelected(movieInfo);
+
+                }
+            }
+        });
 
         if(savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)){
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
