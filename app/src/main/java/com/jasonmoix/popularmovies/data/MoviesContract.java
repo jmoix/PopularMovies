@@ -29,7 +29,7 @@ public class MoviesContract {
 
         public static final String TABLE_NAME = "MovieDB";
 
-        public static final String _ID = "_ID";
+        public static final String _ID = "_id";
         public static final String COLUMN_BACKDROP_PATH = "Backdrop_Path";
         public static final String COLUMN_POSTER_PATH = "Poster_Path";
         public static final String COLUMN_TITLE = "Title";

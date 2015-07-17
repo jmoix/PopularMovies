@@ -3,8 +3,8 @@
 
     <string name="app_name">Popular Movies</string>
 
-    <!-- overflow menu -->
-    <string name="action_settings">Settings</string>
+    <!-- Activity Titles -->
+    <string name="title_activity_settings">Settings</string>
 
     <!-- urls -->
     <string name="base_moviedb_url">http://api.themoviedb.org/3/discover/movie</string>
@@ -16,6 +16,7 @@
     <string name="url_api_key_key">api_key</string>
     <string name="url_api_key_value">f36256adc44abecc27c73f4c0db0b26d</string>
 
+    <string name="sync_account_type">com.jasonmoix.popularmovies</string>
     <string name="content_authority">com.jasonmoix.popularmovies</string>
 
 </resources>
