@@ -12,6 +12,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="settings_theme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    </style>
+
     <style name="toolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:actionMenuTextColor">@color/colorPrimaryDark</item>

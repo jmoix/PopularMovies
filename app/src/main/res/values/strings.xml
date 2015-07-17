@@ -24,4 +24,16 @@
     <string name="sync_account_type">com.jasonmoix.popularmovies</string>
     <string name="content_authority">com.jasonmoix.popularmovies</string>
 
+    <!-- Settings -->
+    <string name="pref_order_label">Sort By</string>
+    <string name="pref_order_key">order</string>
+
+    <string name="pref_order_popularity">popularity</string>
+    <string name="pref_order_popularity_label">By Popularity</string>
+
+    <string name="pref_order_rating">rating</string>
+    <string name="pref_order_rating_label">By Rating</string>
+
+
+
 </resources>
