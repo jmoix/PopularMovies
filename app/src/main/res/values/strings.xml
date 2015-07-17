@@ -11,6 +11,10 @@
     <string name="base_movieposter_url">http://image.tmdb.org/t/p/w185<xliff:g id="movie_id">%1$s</xliff:g></string>
     <string name="base_moviebackdrop_url">http://image.tmdb.org/t/p/w780<xliff:g id="movie_id">%1$s</xliff:g></string>
 
+    <!-- detail strings -->
+    <string name="movie_rating">User Rating: <xliff:g id="movie_id">%1$s</xliff:g>/10</string>
+    <string name="release_date">Release: <xliff:g id="movie_id">%1$s</xliff:g></string>
+
     <!-- url headers -->
     <string name="url_sortBy_key">sort_by</string>
     <string name="url_sortBy_value">popularity.desc</string>

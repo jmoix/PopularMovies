@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.jasonmoix.popularmovies"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -31,4 +31,5 @@ dependencies {
     compile 'com.android.support:design:22.2.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.github.bumptech.glide:glide:3.6.0'
+    compile 'com.android.support:recyclerview-v7:22.2.0'
 }
