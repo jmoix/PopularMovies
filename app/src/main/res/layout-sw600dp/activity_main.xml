@@ -9,7 +9,7 @@
     android:orientation="horizontal"
     tools:context="com.jasonmoix.popularmovies.MainActivity">
 
-    <fragment
+    <FrameLayout
         android:id="@+id/fragment_listing"
         android:layout_width="0dp"
         android:layout_height="match_parent"

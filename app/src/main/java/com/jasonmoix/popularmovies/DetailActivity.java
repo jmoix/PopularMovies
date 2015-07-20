@@ -41,8 +41,6 @@ public class DetailActivity extends AppCompatActivity {
 
         CoordinatorLayout rootLayout = (CoordinatorLayout)findViewById(R.id.main_content);
 
-        Log.d("PopularMovies", getIntent().getStringExtra(MoviesContract.MovieEntry.COLUMN_TITLE));
-
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -55,8 +53,6 @@ public class DetailActivity extends AppCompatActivity {
         ImageView backdrop = (ImageView)findViewById(R.id.backdrop);
         Uri imagePath = Uri.parse(getString(R.string.base_moviebackdrop_url, getIntent().getStringExtra(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH)));
         Glide.with(this).load(imagePath).centerCrop().into(backdrop);
-
-        Log.d("PopularMovies", getString(R.string.base_moviebackdrop_url, getIntent().getStringExtra(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH)));
 
         ViewPager viewPager = (ViewPager)findViewById(R.id.detailPager);
         viewPager.setAdapter(new FragmentPager(getSupportFragmentManager()));

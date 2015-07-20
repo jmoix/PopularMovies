@@ -48,9 +48,11 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                         .replace(R.id.movie_detail_container, new MovieDetailFragment(), DETAIL_TAG)
                         .commit();
             }
+
         }
         else{
             mTwoPane = false;
+
         }
 
         FragmentManager fm = getSupportFragmentManager();
@@ -62,10 +64,6 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                     .add(R.id.fragment_listing, movieListingFragment)
                     .commit();
         }
-
-        Log.d("Popular Movies", "onCreate");
-
-
     }
 
     @Override

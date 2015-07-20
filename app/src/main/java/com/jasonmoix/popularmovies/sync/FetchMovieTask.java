@@ -36,7 +36,6 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
-        Log.d("Popular Movies", "Task Begin");
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -132,8 +131,6 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
                 inserted = mContext.getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, cvArray);
 
             }
-
-            Log.d("Popular Movies", "Task Complete. " + inserted + " inserted.");
 
         }catch (JSONException e){
             e.printStackTrace();
