@@ -1,9 +1,5 @@
 package com.jasonmoix.popularmovies;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,16 +8,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
-
 import com.jasonmoix.popularmovies.data.MoviesContract;
-import com.jasonmoix.popularmovies.service.MoviesService;
 import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
 
 import java.util.ArrayList;
@@ -53,7 +46,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
         void onItemSelected(ArrayList<String> arguments, int position);
     }
 
-    public void moveToPostion(int position){
+    public void moveToPosition(int position){
         mGridView.smoothScrollToPosition(position);
     }
 
@@ -167,10 +160,6 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     }
 
     public void updateMovies(){
-        /*Intent alarmIntent = new Intent(getActivity(), MoviesService.AlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager am = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);*/
         MoviesSyncAdapter.syncImmediately(getActivity());
     }
 }

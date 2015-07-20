@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == DetailActivity.DETAIL_RESULT) {
-            movieListingFragment.moveToPostion(requestCode);
+            movieListingFragment.moveToPosition(requestCode);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
