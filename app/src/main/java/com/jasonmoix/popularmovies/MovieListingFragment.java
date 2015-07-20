@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.jasonmoix.popularmovies.service.MoviesService;
+import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
 
 import java.util.ArrayList;
 
@@ -166,9 +167,10 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     }
 
     public void updateMovies(){
-        Intent alarmIntent = new Intent(getActivity(), MoviesService.AlarmReceiver.class);
+        /*Intent alarmIntent = new Intent(getActivity(), MoviesService.AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
         AlarmManager am = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 2000, pi);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);*/
+        MoviesSyncAdapter.syncImmediately(getActivity());
     }
 }

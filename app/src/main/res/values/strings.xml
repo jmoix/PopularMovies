@@ -21,7 +21,7 @@
     <string name="url_api_key_key">api_key</string>
     <string name="url_api_key_value">f36256adc44abecc27c73f4c0db0b26d</string>
 
-    <string name="sync_account_type">com.jasonmoix.popularmovies</string>
+    <string name="sync_account_type">popularmovies.jasonmoix.com</string>
     <string name="content_authority">com.jasonmoix.popularmovies</string>
 
     <!-- Settings -->
