@@ -1,9 +1,17 @@
 package com.jasonmoix.popularmovies.sync;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SyncRequest;
+import android.content.SyncResult;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.jasonmoix.popularmovies.R;
@@ -22,30 +30,32 @@ import java.net.URL;
 import java.util.Vector;
 
 /**
- * Created by jmoix on 7/17/2015.
+ * Created by jmoix on 7/20/2015.
  */
-public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
+public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
-    private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-    private final Context mContext;
+    public final String LOG_TAG = MoviesSyncAdapter.class.getSimpleName();
+    private Context mContext;
 
-    public FetchMovieTask(Context context){
+    public static final int SYNC_INTERVAL = 60*180;
+    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
+
+    public MoviesSyncAdapter(Context context, boolean autoInitialize){
+        super(context, autoInitialize);
         mContext = context;
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
-
+    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        Log.d("Popular Movies", "onPerformSync Called.");
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
         try{
-
             Uri movieDbUri = Uri.parse(mContext.getString(R.string.base_moviedb_url)).buildUpon()
                     .appendQueryParameter(mContext.getString(R.string.url_sortBy_key), mContext.getString(R.string.url_sortBy_value))
                     .appendQueryParameter(mContext.getString(R.string.url_api_key_key), mContext.getString(R.string.url_api_key_value))
                     .build();
-
             //initialize url for call
             URL callLogLocation = new URL(movieDbUri.toString());
             //open http connection
@@ -56,7 +66,6 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
             String result = readStream(in);
 
             getMovieDataFromJSON(result);
-
 
         }catch (IOException e){
             e.printStackTrace();
@@ -73,8 +82,34 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
                 }
             }
         }
+    }
 
-        return null;
+    public static void syncImmediately(Context context){
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(getSyncAccount(context), context.getString(R.string.content_authority), bundle);
+    }
+
+    public static Account getSyncAccount(Context context){
+
+        AccountManager accountManager =
+                (AccountManager)context.getSystemService(Context.ACCOUNT_SERVICE);
+
+        Account newAccount = new Account(
+                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+
+        if(null == accountManager.getPassword(newAccount)){
+
+            if(!accountManager.addAccountExplicitly(newAccount, "", null)){
+                return null;
+            }
+
+            onAccountCreated(newAccount, context);
+
+        }
+
+        return(newAccount);
     }
 
     public void getMovieDataFromJSON(String moviesJsonStr){
@@ -132,16 +167,18 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
 
             }
 
+            Log.d("Popular Movies", "Sync Finished - " + Integer.toString(inserted) + " records inserted!");
+
         }catch (JSONException e){
             e.printStackTrace();
         }
     }
 
     public String readStream(InputStream in){
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder response = new StringBuilder();
         String buffer;
-
         try {
             while((buffer = reader.readLine()) != null){
                 response.append(buffer);
@@ -150,7 +187,44 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return(response.toString());
     }
+
+
+
+    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime){
+
+        Account account = getSyncAccount(context);
+
+        String authority = context.getString(R.string.content_authority);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+
+            SyncRequest request = new SyncRequest.Builder()
+                    .syncPeriodic(syncInterval, flexTime)
+                    .setSyncAdapter(account, authority)
+                    .setExtras(new Bundle()).build();
+            ContentResolver.requestSync(request);
+
+        }else{
+            ContentResolver.addPeriodicSync(
+                    account,
+                    authority,
+                    new Bundle(),
+                    syncInterval);
+        }
+    }
+
+    public static void initializeSyncAdapter(Context context){
+        getSyncAccount(context);
+    }
+
+    public static void onAccountCreated(Account newAccount, Context context){
+        MoviesSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
+
+        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+
+        syncImmediately(context);
+    }
+
 }

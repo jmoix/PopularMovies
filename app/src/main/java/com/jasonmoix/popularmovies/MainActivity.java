@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
-import com.jasonmoix.popularmovies.sync.FetchMovieTask;
+import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
 
 import java.util.ArrayList;
 
@@ -26,9 +26,9 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new FetchMovieTask(this).execute();
-
         setContentView(R.layout.activity_main);
+
+        MoviesSyncAdapter.initializeSyncAdapter(this);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == DetailActivity.DETAIL_RESULT) {
-            movieListingFragment.moveToPostion(requestCode);
+            movieListingFragment.moveToPosition(requestCode);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

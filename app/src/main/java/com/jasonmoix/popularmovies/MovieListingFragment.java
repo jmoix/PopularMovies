@@ -14,8 +14,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
-
 import com.jasonmoix.popularmovies.data.MoviesContract;
+import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
 
 import java.util.ArrayList;
 
@@ -46,7 +46,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
         void onItemSelected(ArrayList<String> arguments, int position);
     }
 
-    public void moveToPostion(int position){
+    public void moveToPosition(int position){
         mGridView.smoothScrollToPosition(position);
     }
 
@@ -109,7 +109,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        movieListingAdapter.swapCursor(null);
     }
 
     @Override
@@ -157,4 +157,5 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
                 sortOrder);
 
     }
+
 }
