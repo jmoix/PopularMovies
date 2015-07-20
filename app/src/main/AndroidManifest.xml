@@ -39,6 +39,11 @@
             android:name=".data.MoviesProvider"
             android:exported="false"
             android:syncable="true"/>
+        <service
+            android:name=".service.MoviesService"/>
+        <receiver
+            android:name=".service.MoviesService$AlarmReceiver"
+            android:enabled="true"/>
     </application>
 
 </manifest>

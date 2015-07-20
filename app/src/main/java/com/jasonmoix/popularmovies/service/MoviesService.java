@@ -1,9 +1,11 @@
-package com.jasonmoix.popularmovies.sync;
+package com.jasonmoix.popularmovies.service;
 
+import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.jasonmoix.popularmovies.R;
@@ -22,30 +24,25 @@ import java.net.URL;
 import java.util.Vector;
 
 /**
- * Created by jmoix on 7/17/2015.
+ * Created by jmoix on 7/20/2015.
  */
-public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
+public class MoviesService extends IntentService {
 
-    private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-    private final Context mContext;
-
-    public FetchMovieTask(Context context){
-        mContext = context;
+    public MoviesService() {
+        super("Movies");
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected void onHandleIntent(Intent intent) {
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
         try{
-
-            Uri movieDbUri = Uri.parse(mContext.getString(R.string.base_moviedb_url)).buildUpon()
-                    .appendQueryParameter(mContext.getString(R.string.url_sortBy_key), mContext.getString(R.string.url_sortBy_value))
-                    .appendQueryParameter(mContext.getString(R.string.url_api_key_key), mContext.getString(R.string.url_api_key_value))
+            Uri movieDbUri = Uri.parse(this.getString(R.string.base_moviedb_url)).buildUpon()
+                    .appendQueryParameter(this.getString(R.string.url_sortBy_key), this.getString(R.string.url_sortBy_value))
+                    .appendQueryParameter(this.getString(R.string.url_api_key_key), this.getString(R.string.url_api_key_value))
                     .build();
-
             //initialize url for call
             URL callLogLocation = new URL(movieDbUri.toString());
             //open http connection
@@ -56,7 +53,6 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
             String result = readStream(in);
 
             getMovieDataFromJSON(result);
-
 
         }catch (IOException e){
             e.printStackTrace();
@@ -74,7 +70,6 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
             }
         }
 
-        return null;
     }
 
     public void getMovieDataFromJSON(String moviesJsonStr){
@@ -123,12 +118,12 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
 
             if( cVVector.size() > 0){
                 //delete old data
-                mContext.getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI,null,null);
+                this.getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI,null,null);
 
                 //add new data
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                inserted = mContext.getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, cvArray);
+                inserted = this.getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, cvArray);
 
             }
 
@@ -138,10 +133,10 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
     }
 
     public String readStream(InputStream in){
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder response = new StringBuilder();
         String buffer;
-
         try {
             while((buffer = reader.readLine()) != null){
                 response.append(buffer);
@@ -150,7 +145,14 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return(response.toString());
+    }
+
+    static public class AlarmReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent sendIntent = new Intent(context, MoviesService.class);
+            context.startService(sendIntent);
+        }
     }
 }
