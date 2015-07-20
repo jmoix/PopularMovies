@@ -44,12 +44,6 @@
             android:exported="false"
             android:syncable="true"/>
 
-        <service
-            android:name=".service.MoviesService"/>
-        <receiver
-            android:name=".service.MoviesService$AlarmReceiver"
-            android:enabled="true"/>
-
         <service android:name=".sync.MovieAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>

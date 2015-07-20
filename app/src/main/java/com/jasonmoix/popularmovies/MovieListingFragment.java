@@ -53,7 +53,6 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         getLoaderManager().initLoader(MOVIE_LOADER, null, this);
-        updateMovies();
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -159,7 +158,4 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
     }
 
-    public void updateMovies(){
-        MoviesSyncAdapter.syncImmediately(getActivity());
-    }
 }

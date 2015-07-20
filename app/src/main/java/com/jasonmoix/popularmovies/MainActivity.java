@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
+import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
 
 import java.util.ArrayList;
 
@@ -26,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        MoviesSyncAdapter.initializeSyncAdapter(this);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
