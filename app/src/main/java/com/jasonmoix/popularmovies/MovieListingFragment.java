@@ -18,8 +18,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
+import com.jasonmoix.popularmovies.utility.Utility;
 
 import java.util.ArrayList;
 
@@ -34,6 +36,8 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
     private static final int MOVIE_LOADER = 0;
     private static final String SELECTED_KEY = "selected_position";
+    private static final String POPULARITY_CASE = "Popularity DESC";
+    private static final String RATING_CASE = "Vote_Average DESC";
 
     static final int COL_ID = 0;
     static final int COL_BACKDROP_URL = 1;
@@ -113,9 +117,33 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
         super.onSaveInstanceState(outState);
     }
 
+    public void onSortOrderChanged(){
+
+        String sortOrder = Utility.getPreferredSortOrder(getActivity().getBaseContext());
+        switch (sortOrder){
+            case POPULARITY_CASE:
+                Toast.makeText(getActivity().getBaseContext(),
+                        getString(R.string.settings_changed_popularity), Toast.LENGTH_SHORT).show();
+                break;
+            case RATING_CASE:
+                Toast.makeText(getActivity().getBaseContext(),
+                        getString(R.string.settings_changed_rating), Toast.LENGTH_SHORT).show();
+                break;
+        }
+        Cursor cursor = getActivity().getContentResolver().query(
+                MoviesContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                Utility.getPreferredSortOrder(getActivity().getBaseContext()),
+                null
+        );
+        movieListingAdapter.swapCursor(cursor);
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String sortOrder = MoviesContract.MovieEntry.COLUMN_POPULARITY + "ASC";
+        String sortOrder = Utility.getPreferredSortOrder(getActivity().getBaseContext());
         Uri movieLocationUri = MoviesContract.MovieEntry.CONTENT_URI;
 
         return new CursorLoader(getActivity(),
@@ -123,7 +151,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
                 null,
                 null,
                 null,
-                null);
+                sortOrder);
 
     }
 }

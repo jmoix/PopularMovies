@@ -21,21 +21,21 @@
 
             <ImageView
                 android:id="@+id/movie_poster"
-                android:layout_width="150dp"
-                android:layout_height="225dp"
-                android:src="@drawable/poster"/>
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"/>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin">
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_weight="1">
 
                 <TextView
                     android:id="@+id/movie_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Jurassic World"
                     android:textStyle="bold"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"/>
 
@@ -43,17 +43,14 @@
                     android:id="@+id/movie_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-                    android:layout_marginTop="5dp"
-                    android:text="7"/>
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"/>
 
                 <TextView
                     android:id="@+id/movie_release_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
-                    android:layout_marginTop="5dp"
-                    android:text="2015-06-12"/>
+                    android:layout_marginTop="5dp"/>
 
             </LinearLayout>
 
@@ -64,15 +61,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:text="Overview:"/>
+            android:text="Overview:"
+            android:layout_marginTop="5dp"/>
 
         <TextView
             android:id="@+id/movie_overview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
-            android:text="Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond."/>
+            android:layout_marginTop="5dp"/>
 
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

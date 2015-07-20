@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.jasonmoix.popularmovies.sync.FetchMovieTask;
+import com.jasonmoix.popularmovies.utility.Utility;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements MovieListingFragment.Callback {
 
     private static final String DETAIL_TAG = "DTAG";
+    private String mSortOrder;
 
     private boolean mTwoPane;
 
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
+
+        mSortOrder = Utility.getPreferredSortOrder(this);
 
         if(findViewById(R.id.movie_detail_container) != null){
 
@@ -102,4 +106,17 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String sortby = Utility.getPreferredSortOrder(this);
+        if(sortby != null & !sortby.equals(mSortOrder)){
+            MovieListingFragment mf = (MovieListingFragment)getSupportFragmentManager()
+                    .findFragmentById(R.id.fragment_listing);
+            if(null != mf){
+                mf.onSortOrderChanged();
+            }
+            mSortOrder = sortby;
+        }
+    }
 }
