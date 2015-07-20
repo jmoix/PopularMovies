@@ -1,7 +1,5 @@
 package com.jasonmoix.popularmovies;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,18 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
-import com.jasonmoix.popularmovies.utility.Utility;
 
 import java.util.ArrayList;
 
@@ -32,7 +26,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
     private MovieListingAdapter movieListingAdapter;
     private GridView mGridView;
-    private int mPosition = GridView.INVALID_POSITION;
+    private int mPosition;
 
     private static final int MOVIE_LOADER = 0;
     private static final String SELECTED_KEY = "selected_position";
@@ -49,7 +43,11 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     static final int COL_RELEASE_DATE = 7;
 
     public interface Callback {
-        void onItemSelected(ArrayList<String> arguments);
+        void onItemSelected(ArrayList<String> arguments, int position);
+    }
+
+    public void moveToPostion(int position){
+        mGridView.smoothScrollToPosition(position);
     }
 
     @Override
@@ -61,7 +59,6 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         movieListingAdapter = new MovieListingAdapter(getActivity(), null, 0);
 
         View view = inflater.inflate(R.layout.fragment_movie_listing, container, false);
@@ -72,17 +69,18 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Cursor cursor = (Cursor)parent.getItemAtPosition(position);
-                if(cursor != null){
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (cursor != null) {
 
                     cursor.moveToPosition(position);
 
                     ArrayList<String> movieInfo = new ArrayList<>();
-                    for(int i = 0; i < cursor.getColumnCount(); i++){
+                    for (int i = 0; i < cursor.getColumnCount(); i++) {
                         movieInfo.add(cursor.getString(i));
                     }
 
-                    ((Callback)getActivity()).onItemSelected(movieInfo);
+                    mPosition = position;
+                    ((Callback) getActivity()).onItemSelected(movieInfo, mPosition);
 
                 }
             }
@@ -90,6 +88,11 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
         if(savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)){
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
+
+        }else{
+
+            mPosition = GridView.INVALID_POSITION;
+
         }
 
         return view;
@@ -119,7 +122,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
     public void onSortOrderChanged(){
 
-        String sortOrder = Utility.getPreferredSortOrder(getActivity().getBaseContext());
+        String sortOrder = Utils.getPreferredSortOrder(getActivity().getBaseContext());
         switch (sortOrder){
             case POPULARITY_CASE:
                 Toast.makeText(getActivity().getBaseContext(),
@@ -135,7 +138,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
                 null,
                 null,
                 null,
-                Utility.getPreferredSortOrder(getActivity().getBaseContext()),
+                Utils.getPreferredSortOrder(getActivity().getBaseContext()),
                 null
         );
         movieListingAdapter.swapCursor(cursor);
@@ -143,7 +146,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String sortOrder = Utility.getPreferredSortOrder(getActivity().getBaseContext());
+        String sortOrder = Utils.getPreferredSortOrder(getActivity().getBaseContext());
         Uri movieLocationUri = MoviesContract.MovieEntry.CONTENT_URI;
 
         return new CursorLoader(getActivity(),

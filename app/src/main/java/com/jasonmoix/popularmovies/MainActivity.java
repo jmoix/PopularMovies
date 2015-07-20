@@ -1,18 +1,15 @@
 package com.jasonmoix.popularmovies;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.jasonmoix.popularmovies.sync.FetchMovieTask;
-import com.jasonmoix.popularmovies.utility.Utility;
 
 import java.util.ArrayList;
 
@@ -21,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
     private static final String DETAIL_TAG = "DTAG";
     private String mSortOrder;
+    private MovieListingFragment movieListingFragment;
 
     private boolean mTwoPane;
 
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
 
-        mSortOrder = Utility.getPreferredSortOrder(this);
+        mSortOrder = Utils.getPreferredSortOrder(this);
 
         if(findViewById(R.id.movie_detail_container) != null){
 
@@ -56,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         }
 
         FragmentManager fm = getSupportFragmentManager();
-        MovieListingFragment movieListingFragment =
+        movieListingFragment =
                 ((MovieListingFragment)fm.findFragmentById(R.id.fragment_listing));
         if(movieListingFragment == null){
             movieListingFragment = new MovieListingFragment();
@@ -73,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         return true;
     }
 
-    public void onItemSelected(ArrayList<String> arguments){
+    public void onItemSelected(ArrayList<String> arguments, int position){
 
         Intent i = new Intent(this, DetailActivity.class);
         i.putExtra(MoviesContract.MovieEntry._ID, MovieListingFragment.COL_ID);
@@ -84,18 +82,14 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         i.putExtra(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, arguments.get(MovieListingFragment.COL_VOTE));
         i.putExtra(MoviesContract.MovieEntry.COLUMN_POPULARITY, arguments.get(MovieListingFragment.COL_POPULARITY));
         i.putExtra(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, arguments.get(MovieListingFragment.COL_RELEASE_DATE));
-        startActivity(i);
+        startActivityForResult(i, position);
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -105,9 +99,17 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == DetailActivity.DETAIL_RESULT) {
+            movieListingFragment.moveToPostion(requestCode);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        String sortby = Utility.getPreferredSortOrder(this);
+        String sortby = Utils.getPreferredSortOrder(this);
         if(sortby != null & !sortby.equals(mSortOrder)){
             MovieListingFragment mf = (MovieListingFragment)getSupportFragmentManager()
                     .findFragmentById(R.id.fragment_listing);

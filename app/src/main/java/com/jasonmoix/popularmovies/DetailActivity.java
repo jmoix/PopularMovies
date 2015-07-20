@@ -1,6 +1,7 @@
 package com.jasonmoix.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -33,15 +34,19 @@ import com.squareup.picasso.Picasso;
 public class DetailActivity extends AppCompatActivity {
 
     private final int NUM_PAGES = 1;
+    public static final int DETAIL_RESULT = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
+        setResult(DETAIL_RESULT, new Intent());
+
         CoordinatorLayout rootLayout = (CoordinatorLayout)findViewById(R.id.main_content);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_chevron_left_white_24dp));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -70,6 +75,7 @@ public class DetailActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 finish();
+                return(true);
         }
         return super.onOptionsItemSelected(item);
 
