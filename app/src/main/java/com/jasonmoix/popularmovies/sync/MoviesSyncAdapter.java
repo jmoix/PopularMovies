@@ -191,7 +191,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
 
-
     public static void configurePeriodicSync(Context context, int syncInterval, int flexTime){
 
         Account account = getSyncAccount(context);
