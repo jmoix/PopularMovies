@@ -53,24 +53,23 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                         .beginTransaction()
                         .replace(R.id.movie_detail_container, new StartingFragment())
                         .commit();
+
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_listing, new MovieListingFragment())
+                        .commit();
             }
 
         } else{
             Log.d("Popular Movies", "Two Pane is False");
             mTwoPane = false;
-        }
 
-        FragmentManager fm = getSupportFragmentManager();
-        movieListingFragment =
-                ((MovieListingFragment)fm.findFragmentById(R.id.fragment_listing));
-        if(movieListingFragment == null){
             movieListingFragment = new MovieListingFragment();
-            fm.beginTransaction()
-                    .add(R.id.fragment_listing, movieListingFragment)
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_listing, movieListingFragment)
                     .commit();
         }
-
-
 
     }
 
@@ -121,7 +120,9 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == DetailActivity.DETAIL_RESULT) {
-            movieListingFragment.moveToPosition(requestCode);
+            if(MovieListingFragment.mPosition != GridView.INVALID_POSITION){
+                movieListingFragment.moveToPosition(MovieListingFragment.mPosition);
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -130,20 +131,23 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     protected void onResume() {
         super.onResume();
         String sortby = Utils.getPreferredSortOrder(this);
+        Boolean resort = false;
         if(sortby != null & !sortby.equals(mSortOrder)){
+            resort = true;
             MovieListingFragment mf = (MovieListingFragment)getSupportFragmentManager()
                     .findFragmentById(R.id.fragment_listing);
             if(null != mf){
                 mf.onSortOrderChanged();
             }
             mSortOrder = sortby;
-            new getFirstMovieTask().execute(0);
         }
         if(mTwoPane) {
-            if (MovieListingFragment.mPosition != GridView.INVALID_POSITION)
+            if (MovieListingFragment.mPosition != GridView.INVALID_POSITION && resort == false)
                 new getFirstMovieTask().execute(MovieListingFragment.mPosition);
-            else
+            else {
+                resort = false;
                 new getFirstMovieTask().execute(0);
+            }
         }
     }
 
@@ -177,16 +181,18 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         protected void onPostExecute(Uri uri) {
             super.onPostExecute(uri);
 
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(MovieDetailFragment.DETAIL_URI, uri);
+            if(uri != null) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(MovieDetailFragment.DETAIL_URI, uri);
 
-            MovieDetailFragment detailFragment = new MovieDetailFragment();
-            detailFragment.setArguments(bundle);
+                MovieDetailFragment detailFragment = new MovieDetailFragment();
+                detailFragment.setArguments(bundle);
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.movie_detail_container, detailFragment)
-                    .commit();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.movie_detail_container, detailFragment)
+                        .commit();
+            }
         }
     }
 
