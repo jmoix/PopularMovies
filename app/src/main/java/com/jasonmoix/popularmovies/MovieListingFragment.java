@@ -27,7 +27,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
     private MovieListingAdapter movieListingAdapter;
     private GridView mGridView;
-    private int mPosition;
+    public static int mPosition;
 
     private static final int MOVIE_LOADER = 0;
     private static final String SELECTED_KEY = "selected_position";
@@ -44,16 +44,18 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     static final int COL_RELEASE_DATE = 7;
 
 
-    public ArrayList<String> getFirstMovieInfo(){
+    public Uri getFirstMovieInfo(){
 
-        ArrayList<String> arguments = new ArrayList<>();
-
-        return(arguments);
+        Cursor movieCursor = movieListingAdapter.getCursor();
+        movieCursor.moveToFirst();
+        Uri movieUri = MoviesContract.MovieEntry.buildMovieLocationWithId(
+                movieCursor.getString(COL_ID));
+        return(movieUri);
 
     }
 
     public interface Callback {
-        void onItemSelected(Uri backdropPath, Uri uri, int position);
+        void onItemSelected(Uri backdropPath, Uri uri, String title, int position);
     }
 
     public void moveToPosition(int position){
@@ -84,14 +86,15 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
                     cursor.moveToPosition(position);
 
-                    String movieId = cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry._ID));
-                    Log.d("Movie Id", " " + movieId);
-
+                    String movieId = cursor.getString(COL_ID);
                     Uri movieUri = MoviesContract.MovieEntry.buildMovieLocationWithId(movieId);
+
                     Uri backdropPath = Uri.parse(getString(R.string.base_moviebackdrop_url, cursor.getString(COL_BACKDROP_URL)));
 
+                    String movieTitle = cursor.getString(COL_TITLE);
+
                     mPosition = position;
-                    ((Callback) getActivity()).onItemSelected(backdropPath, movieUri, mPosition);
+                    ((Callback) getActivity()).onItemSelected(backdropPath, movieUri, movieTitle, mPosition);
 
                 }
             }

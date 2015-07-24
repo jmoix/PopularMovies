@@ -1,7 +1,9 @@
 package com.jasonmoix.popularmovies;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.GridView;
 
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
@@ -38,6 +41,25 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
 
+        if(findViewById(R.id.movie_detail_container) != null){
+
+            Log.d("Popular Movies", "Two Pane is True");
+
+            mTwoPane = true;
+
+            if(savedInstanceState == null){
+
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.movie_detail_container, new StartingFragment())
+                        .commit();
+            }
+
+        } else{
+            Log.d("Popular Movies", "Two Pane is False");
+            mTwoPane = false;
+        }
+
         FragmentManager fm = getSupportFragmentManager();
         movieListingFragment =
                 ((MovieListingFragment)fm.findFragmentById(R.id.fragment_listing));
@@ -48,25 +70,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                     .commit();
         }
 
-        if(findViewById(R.id.movie_detail_container) != null){
 
-            Log.d("Popular Movies", "Two Pane is True");
-
-            mTwoPane = true;
-
-            if(savedInstanceState == null){
-                MovieDetailFragment detailFragment = new MovieDetailFragment();
-
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.movie_detail_container, new MovieDetailFragment())
-                        .commit();
-            }
-
-        } else{
-            Log.d("Popular Movies", "Two Pane is False");
-            mTwoPane = false;
-        }
 
     }
 
@@ -77,14 +81,28 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         return true;
     }
 
-    public void onItemSelected(Uri backdropUri, Uri uri, int position){
+    public void onItemSelected(Uri backdropUri, Uri uri, String title, int position){
 
         Log.d("Popular Movies", uri.toString());
 
-        Intent i = new Intent(this, DetailActivity.class);
-        i.putExtra(MovieDetailFragment.DETAIL_URI, uri);
-        i.putExtra(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, backdropUri);
-        startActivityForResult(i, position);
+        if(mTwoPane){
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(MovieDetailFragment.DETAIL_URI, uri);
+
+            MovieDetailFragment detailFragment = new MovieDetailFragment();
+            detailFragment.setArguments(bundle);
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.movie_detail_container, detailFragment)
+                    .commit();
+        }else {
+            Intent i = new Intent(this, DetailActivity.class);
+            i.putExtra(MovieDetailFragment.DETAIL_URI, uri);
+            i.putExtra(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, backdropUri);
+            i.putExtra(MoviesContract.MovieEntry.COLUMN_TITLE, title);
+            startActivityForResult(i, position);
+        }
 
     }
 
@@ -119,6 +137,57 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                 mf.onSortOrderChanged();
             }
             mSortOrder = sortby;
+            new getFirstMovieTask().execute(0);
+        }
+        if(mTwoPane) {
+            if (MovieListingFragment.mPosition != GridView.INVALID_POSITION)
+                new getFirstMovieTask().execute(MovieListingFragment.mPosition);
+            else
+                new getFirstMovieTask().execute(0);
         }
     }
+
+    private class getFirstMovieTask extends AsyncTask<Integer, Void, Uri>{
+
+        @Override
+        protected Uri doInBackground(Integer... params) {
+
+            Uri movieUri = null;
+            Cursor movieCursor = getContentResolver().query(
+                    MoviesContract.MovieEntry.CONTENT_URI,
+                    new String[]{MoviesContract.MovieEntry._ID},
+                    null,
+                    null,
+                    Utils.getPreferredSortOrder(getBaseContext())
+            );
+
+            if(movieCursor.moveToPosition(params[0])){
+                String id = movieCursor.getString(movieCursor.getColumnIndex(MoviesContract.MovieEntry._ID));
+                Log.d("Movie Cursor", id);
+                movieUri = MoviesContract.MovieEntry.buildMovieLocationWithId(id);
+            }
+            else{
+                Log.d("Movie Cursor", "Empty");
+            }
+
+            return movieUri;
+        }
+
+        @Override
+        protected void onPostExecute(Uri uri) {
+            super.onPostExecute(uri);
+
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(MovieDetailFragment.DETAIL_URI, uri);
+
+            MovieDetailFragment detailFragment = new MovieDetailFragment();
+            detailFragment.setArguments(bundle);
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.movie_detail_container, detailFragment)
+                    .commit();
+        }
+    }
+
 }

@@ -59,6 +59,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     public static final int COL_MOVIE_RELEASE = 7;
 
     private ImageView poster;
+    private ImageView backdrop;
     private TextView title;
     private TextView releaseDate;
     private TextView rating;
