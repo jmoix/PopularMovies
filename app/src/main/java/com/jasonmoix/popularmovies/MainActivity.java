@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                         .replace(R.id.movie_detail_container, new StartingFragment())
                         .commit();
 
+                movieListingFragment = new MovieListingFragment();
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragment_listing, new MovieListingFragment())
