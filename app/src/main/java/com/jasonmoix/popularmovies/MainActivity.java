@@ -1,10 +1,12 @@
 package com.jasonmoix.popularmovies;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -20,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     private String mSortOrder;
     private MovieListingFragment movieListingFragment;
 
-    private boolean mTwoPane;
+    public static boolean mTwoPane = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,28 +32,11 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
         MoviesSyncAdapter.initializeSyncAdapter(this);
 
+        mSortOrder = Utils.getPreferredSortOrder(this);
+
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
-
-        mSortOrder = Utils.getPreferredSortOrder(this);
-
-        if(findViewById(R.id.movie_detail_container) != null){
-
-            mTwoPane = true;
-
-            if(savedInstanceState == null){
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.movie_detail_container, new MovieDetailFragment(), DETAIL_TAG)
-                        .commit();
-            }
-
-        }
-        else{
-            mTwoPane = false;
-
-        }
 
         FragmentManager fm = getSupportFragmentManager();
         movieListingFragment =
@@ -62,6 +47,27 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                     .add(R.id.fragment_listing, movieListingFragment)
                     .commit();
         }
+
+        if(findViewById(R.id.movie_detail_container) != null){
+
+            Log.d("Popular Movies", "Two Pane is True");
+
+            mTwoPane = true;
+
+            if(savedInstanceState == null){
+                MovieDetailFragment detailFragment = new MovieDetailFragment();
+
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.movie_detail_container, new MovieDetailFragment())
+                        .commit();
+            }
+
+        } else{
+            Log.d("Popular Movies", "Two Pane is False");
+            mTwoPane = false;
+        }
+
     }
 
     @Override
@@ -71,17 +77,13 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         return true;
     }
 
-    public void onItemSelected(ArrayList<String> arguments, int position){
+    public void onItemSelected(Uri backdropUri, Uri uri, int position){
+
+        Log.d("Popular Movies", uri.toString());
 
         Intent i = new Intent(this, DetailActivity.class);
-        i.putExtra(MoviesContract.MovieEntry._ID, MovieListingFragment.COL_ID);
-        i.putExtra(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, arguments.get(MovieListingFragment.COL_BACKDROP_URL));
-        i.putExtra(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, arguments.get(MovieListingFragment.COL_POSTER_URL));
-        i.putExtra(MoviesContract.MovieEntry.COLUMN_TITLE, arguments.get(MovieListingFragment.COL_TITLE));
-        i.putExtra(MoviesContract.MovieEntry.COLUMN_OVERVIEW, arguments.get(MovieListingFragment.COL_OVERVIEW));
-        i.putExtra(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, arguments.get(MovieListingFragment.COL_VOTE));
-        i.putExtra(MoviesContract.MovieEntry.COLUMN_POPULARITY, arguments.get(MovieListingFragment.COL_POPULARITY));
-        i.putExtra(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, arguments.get(MovieListingFragment.COL_RELEASE_DATE));
+        i.putExtra(MovieDetailFragment.DETAIL_URI, uri);
+        i.putExtra(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, backdropUri);
         startActivityForResult(i, position);
 
     }

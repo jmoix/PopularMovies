@@ -146,7 +146,17 @@ public class MoviesProvider extends ContentProvider {
                 retCursor.setNotificationUri(getContext().getContentResolver(), uri);
                 return(retCursor);
             case MOVIE:
-                return(null);
+                retCursor = movieDbHelper.getReadableDatabase().query(
+                        MoviesContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+                return(retCursor);
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

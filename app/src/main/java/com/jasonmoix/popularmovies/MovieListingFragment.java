@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,8 +43,17 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     static final int COL_POPULARITY = 6;
     static final int COL_RELEASE_DATE = 7;
 
+
+    public ArrayList<String> getFirstMovieInfo(){
+
+        ArrayList<String> arguments = new ArrayList<>();
+
+        return(arguments);
+
+    }
+
     public interface Callback {
-        void onItemSelected(ArrayList<String> arguments, int position);
+        void onItemSelected(Uri backdropPath, Uri uri, int position);
     }
 
     public void moveToPosition(int position){
@@ -74,13 +84,14 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
                     cursor.moveToPosition(position);
 
-                    ArrayList<String> movieInfo = new ArrayList<>();
-                    for (int i = 0; i < cursor.getColumnCount(); i++) {
-                        movieInfo.add(cursor.getString(i));
-                    }
+                    String movieId = cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry._ID));
+                    Log.d("Movie Id", " " + movieId);
+
+                    Uri movieUri = MoviesContract.MovieEntry.buildMovieLocationWithId(movieId);
+                    Uri backdropPath = Uri.parse(getString(R.string.base_moviebackdrop_url, cursor.getString(COL_BACKDROP_URL)));
 
                     mPosition = position;
-                    ((Callback) getActivity()).onItemSelected(movieInfo, mPosition);
+                    ((Callback) getActivity()).onItemSelected(backdropPath, movieUri, mPosition);
 
                 }
             }
