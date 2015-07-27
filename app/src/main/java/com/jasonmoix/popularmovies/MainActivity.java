@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
     private static final String DETAIL_TAG = "DTAG";
     private String mSortOrder;
-    private MovieListingFragment movieListingFragment;
 
     public static boolean mTwoPane = false;
 
@@ -54,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                         .replace(R.id.movie_detail_container, new StartingFragment())
                         .commit();
 
-                movieListingFragment = new MovieListingFragment();
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragment_listing, new MovieListingFragment())
@@ -65,10 +63,9 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
             Log.d("Popular Movies", "Two Pane is False");
             mTwoPane = false;
 
-            movieListingFragment = new MovieListingFragment();
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_listing, movieListingFragment)
+                    .replace(R.id.fragment_listing, new MovieListingFragment())
                     .commit();
         }
 
@@ -121,8 +118,10 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == DetailActivity.DETAIL_RESULT) {
-            if(MovieListingFragment.mPosition != GridView.INVALID_POSITION){
-                movieListingFragment.moveToPosition(MovieListingFragment.mPosition);
+            MovieListingFragment mf = (MovieListingFragment)getSupportFragmentManager()
+                    .findFragmentById(R.id.fragment_listing);
+            if(null != mf && MovieListingFragment.mPosition != GridView.INVALID_POSITION){
+                mf.moveToPosition(MovieListingFragment.mPosition);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

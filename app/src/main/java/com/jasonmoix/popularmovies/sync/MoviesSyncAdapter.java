@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -123,6 +124,8 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         final String BACKDROP = "backdrop_path";
         final String POSTER = "poster_path";
 
+        ArrayList<Integer> ids_inserted = new ArrayList<>();
+
         try{
 
             JSONObject moviesJSON = new JSONObject(moviesJsonStr);
@@ -151,6 +154,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 movieValues.put(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, backdrop);
                 movieValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, poster);
 
+                ids_inserted.add(id);
                 cVVector.add(movieValues);
             }
 
@@ -159,6 +163,8 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             if( cVVector.size() > 0){
                 //delete old data
                 mContext.getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI,null,null);
+                mContext.getContentResolver().delete(MoviesContract.ReviewEntry.CONTENT_URI,null,null);
+                mContext.getContentResolver().delete(MoviesContract.VideoEntry.CONTENT_URI,null,null);
 
                 //add new data
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
@@ -167,11 +173,201 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
             }
 
+            for(int i = 0; i < ids_inserted.size(); i++){
+                getReviews(ids_inserted.get(i));
+                getVideos(ids_inserted.get(i));
+            }
+
             Log.d("Popular Movies", "Sync Finished - " + Integer.toString(inserted) + " records inserted!");
 
         }catch (JSONException e){
             e.printStackTrace();
         }
+    }
+
+    public void getReviewDataFromJSON(String jsonString, int movieId){
+
+        final String ID = "id";
+        final String AUTHOR = "author";
+        final String CONTENT = "content";
+        final String URL = "url";
+
+        Log.d("Popular Movies", "Review JSON =" + jsonString);
+
+        try{
+
+            JSONObject object = new JSONObject(jsonString);
+            JSONArray array = object.getJSONArray("results");
+
+            Vector<ContentValues> cVVector = new Vector<ContentValues>(array.length());
+
+            for(int i = 0; i < array.length(); i++){
+                String id = array.getJSONObject(i).getString(ID);
+                String author = array.getJSONObject(i).getString(AUTHOR);
+                String content = array.getJSONObject(i).getString(CONTENT);
+                String url = array.getJSONObject(i).getString(URL);
+
+                ContentValues value = new ContentValues();
+                value.put(MoviesContract.ReviewEntry._ID, id);
+                value.put(MoviesContract.ReviewEntry.COLUMN_MOVIE_ID, movieId);
+                value.put(MoviesContract.ReviewEntry.COLUMN_AUTHOR, author);
+                value.put(MoviesContract.ReviewEntry.COLUMN_CONTENT, content);
+                value.put(MoviesContract.ReviewEntry.COLUMN_URL, url);
+
+                cVVector.add(value);
+            }
+
+            int inserted = 0;
+
+            if( cVVector.size() > 0){
+
+                //add new data
+                ContentValues[] cvArray = new ContentValues[cVVector.size()];
+                cVVector.toArray(cvArray);
+                inserted = mContext.getContentResolver().bulkInsert(MoviesContract.ReviewEntry.CONTENT_URI, cvArray);
+
+            }
+
+            Log.d("Popular Movies", "Sync Finished - " + Integer.toString(inserted) + " records inserted!");
+
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void getReviews(int movieId){
+
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        try{
+            Uri movieDbUri = Uri.parse(mContext.getString(R.string.base_moviereview_url, movieId)).buildUpon()
+                    .appendQueryParameter(mContext.getString(R.string.url_api_key_key), mContext.getString(R.string.url_api_key_value))
+                    .build();
+            //initialize url for call
+            URL callLogLocation = new URL(movieDbUri.toString());
+            //open http connection
+            urlConnection = (HttpURLConnection)callLogLocation.openConnection();
+            //get input stream from request
+            InputStream in = urlConnection.getInputStream();
+            //call readstream() to get information to initialize result string
+            String result = readStream(in);
+
+            getReviewDataFromJSON(result, movieId);
+
+        }catch (IOException e){
+            e.printStackTrace();
+        } finally {
+
+            if(urlConnection != null){
+                urlConnection.disconnect();
+            }
+            if(reader != null){
+                try {
+                    reader.close();
+                }catch (final IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void getVideoDataFromJSON(String jsonString, int movieId){
+
+        final String ID = "id";
+        final String ISO = "iso_639_1";
+        final String KEY = "key";
+        final String NAME = "name";
+        final String SITE = "site";
+        final String SIZE = "size";
+        final String TYPE = "type";
+
+        Log.d("Popular Movies", "Video JSON =" + jsonString);
+
+        try{
+
+            JSONObject object = new JSONObject(jsonString);
+            JSONArray array = object.getJSONArray("results");
+
+            Vector<ContentValues> cVVector = new Vector<ContentValues>(array.length());
+
+            for(int i = 0; i < array.length(); i++){
+                String id = array.getJSONObject(i).getString(ID);
+                String iso = array.getJSONObject(i).getString(ISO);
+                String key = array.getJSONObject(i).getString(KEY);
+                String name = array.getJSONObject(i).getString(NAME);
+                String site = array.getJSONObject(i).getString(SITE);
+                int size = array.getJSONObject(i).getInt(SIZE);
+                String type = array.getJSONObject(i).getString(TYPE);
+
+                ContentValues value = new ContentValues();
+                value.put(MoviesContract.VideoEntry._ID, id);
+                value.put(MoviesContract.VideoEntry.COLUMN_MOVIE_ID, movieId);
+                value.put(MoviesContract.VideoEntry.COLUMN_ISO, iso);
+                value.put(MoviesContract.VideoEntry.COLUMN_KEY, key);
+                value.put(MoviesContract.VideoEntry.COLUMN_NAME, name);
+                value.put(MoviesContract.VideoEntry.COLUMN_SITE, site);
+                value.put(MoviesContract.VideoEntry.COLUMN_SIZE, size);
+                value.put(MoviesContract.VideoEntry.COLUMN_TYPE, type);
+
+                cVVector.add(value);
+            }
+
+            int inserted = 0;
+
+            if( cVVector.size() > 0){
+
+                //add new data
+                ContentValues[] cvArray = new ContentValues[cVVector.size()];
+                cVVector.toArray(cvArray);
+                inserted = mContext.getContentResolver().bulkInsert(MoviesContract.VideoEntry.CONTENT_URI, cvArray);
+
+            }
+
+            Log.d("Popular Movies", "Sync Finished - " + Integer.toString(inserted) + " records inserted!");
+
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void getVideos(int movieId){
+
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        try{
+            Uri movieDbUri = Uri.parse(mContext.getString(R.string.base_movievideo_url, movieId)).buildUpon()
+                    .appendQueryParameter(mContext.getString(R.string.url_api_key_key), mContext.getString(R.string.url_api_key_value))
+                    .build();
+            //initialize url for call
+            URL callLogLocation = new URL(movieDbUri.toString());
+            //open http connection
+            urlConnection = (HttpURLConnection)callLogLocation.openConnection();
+            //get input stream from request
+            InputStream in = urlConnection.getInputStream();
+            //call readstream() to get information to initialize result string
+            String result = readStream(in);
+
+            getVideoDataFromJSON(result, movieId);
+
+        }catch (IOException e){
+            e.printStackTrace();
+        } finally {
+
+            if(urlConnection != null){
+                urlConnection.disconnect();
+            }
+            if(reader != null){
+                try {
+                    reader.close();
+                }catch (final IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
 
     public String readStream(InputStream in){

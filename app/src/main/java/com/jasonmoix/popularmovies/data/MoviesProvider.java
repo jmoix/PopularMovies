@@ -18,6 +18,10 @@ public class MoviesProvider extends ContentProvider {
 
     public static final int MOVIES = 100;
     public static final int MOVIE = 101;
+    public static final int REVIEWS = 102;
+    public static final int REVIEWS_WITH_MOVIE = 103;
+    public static final int VIDEOS = 104;
+    public static final int VIDEOS_WITH_MOVIE = 105;
 
     public static UriMatcher buildUriMatcher(){
 
@@ -26,6 +30,10 @@ public class MoviesProvider extends ContentProvider {
 
         matcher.addURI(authority, MoviesContract.PATH_MOVIES, MOVIES);
         matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*", MOVIE);
+        matcher.addURI(authority, MoviesContract.PATH_REVIEWS, REVIEWS);
+        matcher.addURI(authority, MoviesContract.PATH_REVIEWS + "/*", REVIEWS_WITH_MOVIE);
+        matcher.addURI(authority, MoviesContract.PATH_VIDEOS, VIDEOS);
+        matcher.addURI(authority, MoviesContract.PATH_VIDEOS + "/*", VIDEOS_WITH_MOVIE);
 
         return(matcher);
 
@@ -35,11 +43,11 @@ public class MoviesProvider extends ContentProvider {
 
         final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
+        int returnCount = 0;
 
         switch (match){
             case MOVIES:
                 db.beginTransaction();
-                int returnCount = 0;
 
                 try{
 
@@ -53,6 +61,38 @@ public class MoviesProvider extends ContentProvider {
                     db.endTransaction();
                 }
 
+                getContext().getContentResolver().notifyChange(uri, null);
+                return(returnCount);
+
+            case REVIEWS:
+                db.beginTransaction();
+
+                try {
+
+                    for(ContentValues value : values){
+                        long _id = db.insert(MoviesContract.ReviewEntry.TABLE_NAME, null, value);
+                        if(_id != -1) returnCount++;
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return(returnCount);
+
+            case VIDEOS:
+                db.beginTransaction();
+
+                try {
+
+                    for(ContentValues value : values){
+                        long _id = db.insert(MoviesContract.VideoEntry.TABLE_NAME, null, value);
+                        if(_id != -1) returnCount++;
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
                 getContext().getContentResolver().notifyChange(uri, null);
                 return(returnCount);
 
@@ -72,8 +112,15 @@ public class MoviesProvider extends ContentProvider {
         switch (match){
             case MOVIES:
                 rowsDeleted = db.delete(
-                        MoviesContract.MovieEntry.TABLE_NAME, selection, selectionArgs
-                );
+                        MoviesContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case REVIEWS:
+                rowsDeleted = db.delete(
+                        MoviesContract.ReviewEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case VIDEOS:
+                rowsDeleted = db.delete(
+                        MoviesContract.VideoEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -89,11 +136,18 @@ public class MoviesProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match){
-
             case MOVIES:
                 return MoviesContract.MovieEntry.CONTENT_TYPE;
             case MOVIE:
                 return MoviesContract.MovieEntry.CONTENT_ITEM_TYPE;
+            case REVIEWS:
+                return MoviesContract.ReviewEntry.CONTENT_TYPE;
+            case REVIEWS_WITH_MOVIE:
+                return MoviesContract.ReviewEntry.CONTENT_TYPE;
+            case VIDEOS:
+                return MoviesContract.VideoEntry.CONTENT_TYPE;
+            case VIDEOS_WITH_MOVIE:
+                return MoviesContract.VideoEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -106,11 +160,22 @@ public class MoviesProvider extends ContentProvider {
         final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
+        long _id = 0;
 
         switch (match){
             case MOVIES:
-                long _id = db.insert(MoviesContract.MovieEntry.TABLE_NAME, null, values);
+                _id = db.insert(MoviesContract.MovieEntry.TABLE_NAME, null, values);
                 if(_id > 0) returnUri = MoviesContract.MovieEntry.buildMovieUri(_id);
+                else throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            case REVIEWS:
+                _id = db.insert(MoviesContract.ReviewEntry.TABLE_NAME, null, values);
+                if(_id > 0) returnUri = MoviesContract.ReviewEntry.buildReviewsUri(_id);
+                else throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            case VIDEOS:
+                _id = db.insert(MoviesContract.VideoEntry.TABLE_NAME, null, values);
+                if(_id > 0) returnUri = MoviesContract.VideoEntry.buildVideosUri(_id);
                 else throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             default:
@@ -181,6 +246,12 @@ public class MoviesProvider extends ContentProvider {
         switch (match){
             case MOVIES:
                 rowsUpdated = db.update(MoviesContract.MovieEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case REVIEWS:
+                rowsUpdated = db.update(MoviesContract.ReviewEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case VIDEOS:
+                rowsUpdated = db.update(MoviesContract.VideoEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
