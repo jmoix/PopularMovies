@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -35,6 +36,10 @@ public class DetailActivity extends AppCompatActivity {
 
     private final int NUM_PAGES = 1;
     public static final int DETAIL_RESULT = 100;
+
+    public void favorite(View view){
+        Log.d("Popular Movies", Boolean.toString(view.isSelected()));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

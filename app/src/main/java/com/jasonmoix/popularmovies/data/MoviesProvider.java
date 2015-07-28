@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
@@ -22,6 +23,20 @@ public class MoviesProvider extends ContentProvider {
     public static final int REVIEWS_WITH_MOVIE = 103;
     public static final int VIDEOS = 104;
     public static final int VIDEOS_WITH_MOVIE = 105;
+
+    private static final SQLiteQueryBuilder sDetailReviewQuery;
+
+    static {
+        sDetailReviewQuery = new SQLiteQueryBuilder();
+
+        sDetailReviewQuery.setTables(
+                MoviesContract.MovieEntry.TABLE_NAME + " INNER JOIN " +
+                        MoviesContract.ReviewEntry.TABLE_NAME +
+                        " ON " + MoviesContract.MovieEntry.TABLE_NAME +
+                        "." + MoviesContract.MovieEntry._ID +
+                        " = " + MoviesContract.ReviewEntry.TABLE_NAME +
+                        "." + MoviesContract.ReviewEntry.COLUMN_MOVIE_ID);
+    }
 
     public static UriMatcher buildUriMatcher(){
 
