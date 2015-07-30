@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     @Override
     protected void onResume() {
         super.onResume();
+        //MoviesSyncAdapter.syncImmediately(this);
         String sortby = Utils.getPreferredSortOrder(this);
         Boolean resort = false;
         if(sortby != null & !sortby.equals(mSortOrder)){

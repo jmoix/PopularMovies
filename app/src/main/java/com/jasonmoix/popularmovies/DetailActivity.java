@@ -34,7 +34,7 @@ import com.squareup.picasso.Picasso;
  */
 public class DetailActivity extends AppCompatActivity {
 
-    private final int NUM_PAGES = 1;
+    private final int NUM_PAGES = 3;
     public static final int DETAIL_RESULT = 100;
 
     public void favorite(View view){
@@ -97,7 +97,17 @@ public class DetailActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return MovieDetailFragment.newInstance(getIntent().getExtras());
+            switch (position){
+                case 0:
+                    return MovieDetailFragment.newInstance(getIntent().getExtras());
+                case 1:
+                    return MovieReviewFragment.newInstance(getIntent().getExtras());
+                case 2:
+                    return MovieVideoFragment.newInstance(getIntent().getExtras());
+                default:
+                    return null;
+            }
+
         }
 
     }

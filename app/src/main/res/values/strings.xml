@@ -12,16 +12,21 @@
     <string name="base_moviebackdrop_url">http://image.tmdb.org/t/p/w780<xliff:g id="movie_id">%1$s</xliff:g></string>
     <string name="base_moviereview_url">http://api.themoviedb.org/3/movie/<xliff:g id="movie_id">%1$s</xliff:g>/reviews</string>
     <string name="base_movievideo_url">http://api.themoviedb.org/3/movie/<xliff:g id="movie_id">%1$s</xliff:g>/videos</string>
+    <string name="base_youtube_url">http://www.youtube.com/watch?v=<xliff:g id="video_key">%1$s</xliff:g></string>
 
     <!-- detail strings -->
     <string name="movie_rating">User Rating: <xliff:g id="movie_id">%1$s</xliff:g>/10</string>
     <string name="release_date">Release: <xliff:g id="movie_id">%1$s</xliff:g></string>
+    <string name="content_abridged"><xliff:g id="review_content">%1$s</xliff:g>... (click for more)</string>
+    <string name="content_full"><xliff:g id="review_content">%1$s</xliff:g>(click for more)</string>
+    <string name="no_reviews">There are no reviews currently available for this movie...</string>
+    <string name="no_videos">There are no videos currently available for this movie...</string>
 
     <!-- url headers -->
     <string name="url_sortBy_key">sort_by</string>
     <string name="url_sortBy_value">popularity.desc</string>
     <string name="url_api_key_key">api_key</string>
-    <string name="url_api_key_value">xxxxxxxxxxxxxxxxxxxxxxxxxxx</string>
+    <string name="url_api_key_value">f36256adc44abecc27c73f4c0db0b26d</string>
 
     <string name="sync_account_type">popularmovies.jasonmoix.com</string>
     <string name="content_authority">com.jasonmoix.popularmovies</string>

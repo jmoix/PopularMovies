@@ -158,7 +158,7 @@ public class MoviesProvider extends ContentProvider {
             case REVIEWS:
                 return MoviesContract.ReviewEntry.CONTENT_TYPE;
             case REVIEWS_WITH_MOVIE:
-                return MoviesContract.ReviewEntry.CONTENT_TYPE;
+                return MoviesContract.ReviewEntry.CONTENT_ITEM_TYPE;
             case VIDEOS:
                 return MoviesContract.VideoEntry.CONTENT_TYPE;
             case VIDEOS_WITH_MOVIE:
@@ -228,6 +228,30 @@ public class MoviesProvider extends ContentProvider {
             case MOVIE:
                 retCursor = movieDbHelper.getReadableDatabase().query(
                         MoviesContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+                return(retCursor);
+            case REVIEWS:
+                retCursor = movieDbHelper.getReadableDatabase().query(
+                        MoviesContract.ReviewEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+                return(retCursor);
+            case VIDEOS:
+                retCursor = movieDbHelper.getReadableDatabase().query(
+                        MoviesContract.VideoEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,

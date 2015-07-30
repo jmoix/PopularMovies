@@ -418,8 +418,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         MoviesSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
 
         ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
-
-        syncImmediately(context);
     }
 
 }

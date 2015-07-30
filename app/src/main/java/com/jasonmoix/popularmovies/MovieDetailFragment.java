@@ -1,31 +1,26 @@
 package com.jasonmoix.popularmovies;
 
 import android.database.Cursor;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
-
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.squareup.picasso.Picasso;
-
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -37,7 +32,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     public static final String DETAIL_URI = "URI";
 
-    private static final int DETAIL_LOADER = 0;
+    private static final int DETAIL_LOADER = 1;
 
     private static final String[] DETAIL_COLUMNS = {
             MoviesContract.MovieEntry.TABLE_NAME + "." + MoviesContract.MovieEntry._ID,
@@ -50,6 +45,14 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             MoviesContract.MovieEntry.COLUMN_RELEASE_DATE
     };
 
+    private static final String[] REVIEW_COLUMNS = {
+            MoviesContract.ReviewEntry.TABLE_NAME + "." + MoviesContract.ReviewEntry._ID,
+            MoviesContract.ReviewEntry.COLUMN_MOVIE_ID,
+            MoviesContract.ReviewEntry.COLUMN_AUTHOR,
+            MoviesContract.ReviewEntry.COLUMN_CONTENT,
+            MoviesContract.ReviewEntry.COLUMN_URL
+    };
+
     public static final int COL_MOVIE_ID = 0;
     public static final int COL_MOVIE_BACKDROP = 1;
     public static final int COL_MOVIE_POSTER = 2;
@@ -58,6 +61,12 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     public static final int COL_MOVIE_VOTE = 5;
     public static final int COL_MOVIE_POPULARITY = 6;
     public static final int COL_MOVIE_RELEASE = 7;
+
+    public static final int COL_REVIEW_ID = 0;
+    public static final int COL_REVIEW_MOVIE_ID = 1;
+    public static final int COL_REVIEW_AUTHOR = 2;
+    public static final int COL_REVIEW_CONTENT = 3;
+    public static final int COL_REVIEW_URL = 4;
 
     private ImageView poster;
     private ImageView backdrop;
@@ -85,6 +94,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         releaseDate = (TextView) rootView.findViewById(R.id.movie_release_date);
         rating = (TextView) rootView.findViewById(R.id.movie_rating);
         overview = (TextView) rootView.findViewById(R.id.movie_overview);
+
         return(rootView);
 
     }
@@ -117,6 +127,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(null != mUri){
+            Log.d("Popular Movies", "Detail Loader Created");
             return new CursorLoader(
                     getActivity(),
                     mUri,
@@ -132,18 +143,16 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        if(data != null && data.moveToFirst()){
+        if (data != null && data.moveToFirst()) {
 
             Uri posterUri = Uri.parse(data.getString(COL_MOVIE_POSTER));
             String titleInfo = data.getString(COL_MOVIE_TITLE);
             String overviewInfo = data.getString(COL_MOVIE_OVERVIEW);
             String ratingInfo = data.getString(COL_MOVIE_VOTE);
             String releaseInfo = data.getString(COL_MOVIE_RELEASE);
-
             Picasso.with(getActivity().getBaseContext())
                     .load(getString(R.string.base_movieposter_url, posterUri))
                     .into(poster);
-
             title.setText(titleInfo);
             releaseDate.setText(getString(R.string.release_date,
                     formatDate(releaseInfo)));
@@ -154,6 +163,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
     }
+
 }
