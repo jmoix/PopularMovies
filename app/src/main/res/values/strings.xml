@@ -8,6 +8,11 @@
     <string name="title_detail_information">Overview</string>
     <string name="title_detail_reviews">Reviews</string>
     <string name="title_detail_videos">Videos</string>
+    <string name="title_favorites">Show/Hide Favorites</string>
+
+    <!-- Toasts -->
+    <string name="showing_favorites">Now showing only your favorites</string>
+    <string name="hiding_favorites">Now showing all titles</string>
 
     <!-- urls -->
     <string name="base_moviedb_url">http://api.themoviedb.org/3/discover/movie</string>
@@ -24,6 +29,7 @@
     <string name="content_full"><xliff:g id="review_content">%1$s</xliff:g>(click for more)</string>
     <string name="no_reviews">There are no reviews currently available for this movie...</string>
     <string name="no_videos">There are no videos currently available for this movie...</string>
+    <string name="no_movies">There are no movies in this list...</string>
 
     <!-- url headers -->
     <string name="url_sortBy_key">sort_by</string>

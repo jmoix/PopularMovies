@@ -7,4 +7,10 @@
         android:orderInCategory="100"
         android:icon="@drawable/ic_settings_white_24dp"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_favorites"
+        android:title="@string/title_favorites"
+        android:orderInCategory="99"
+        android:icon="@drawable/ic_favorite_white_24dp"
+        app:showAsAction="ifRoom"/>
 </menu>

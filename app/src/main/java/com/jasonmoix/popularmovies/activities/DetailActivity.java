@@ -185,7 +185,7 @@ public class DetailActivity extends AppCompatActivity implements MovieDetailFrag
                     break;
                 case 1:
                     values = new ContentValues();
-                    values.put(MoviesContract.MovieEntry.COLUMN_FAVORITE, 1);
+                    values.put(MoviesContract.MovieEntry.COLUMN_FAVORITE, 0);
                     context.getContentResolver().update(
                             MoviesContract.MovieEntry.CONTENT_URI,
                             values,

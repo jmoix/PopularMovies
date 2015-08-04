@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.jasonmoix.popularmovies.fragments.MovieDetailFragment;
 import com.jasonmoix.popularmovies.fragments.MovieListingFragment;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     private String mSortOrder;
 
     public static boolean mTwoPane = false;
+    public static boolean showFavorites = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,11 +109,23 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
+        switch (item.getItemId()){
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_favorites:
+                if(showFavorites){
+                    Toast.makeText(this, getString(R.string.hiding_favorites), Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.drawable.ic_favorite_white_24dp);
+                }else {
+                    Toast.makeText(this, getString(R.string.showing_favorites), Toast.LENGTH_SHORT).show();
+                    item.setIcon(R.drawable.favorite_blue);
+                }
+                showFavorites = !showFavorites;
+                ((MovieListingFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_listing))
+                        .switchData(showFavorites);
+                break;
         }
 
         return super.onOptionsItemSelected(item);

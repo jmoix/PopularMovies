@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
     private MovieListingAdapter movieListingAdapter;
     private GridView mGridView;
+    private CardView emptyView;
     public static int mPosition;
 
     private static final int MOVIE_LOADER = 0;
@@ -109,16 +111,26 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
 
         }
 
+        emptyView = (CardView)view.findViewById(R.id.no_items_view);
+
         return view;
 
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        if(data == null || data.getCount() == 0){
+            emptyView.setVisibility(View.VISIBLE);
+        }else{
+            emptyView.setVisibility(View.GONE);
+        }
+
         movieListingAdapter.swapCursor(data);
         if(mPosition != GridView.INVALID_POSITION){
             mGridView.smoothScrollToPosition(mPosition);
         }
+
     }
 
     @Override
@@ -170,6 +182,45 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
                 null,
                 sortOrder);
 
+    }
+
+    public void switchData(Boolean favorites){
+
+        Cursor c;
+
+        if(favorites){
+            c = getActivity().getBaseContext().getContentResolver()
+            .query(MoviesContract.MovieEntry.CONTENT_URI,
+                    null,
+                    MoviesContract.MovieEntry.COLUMN_FAVORITE + " =?",
+                    new String[]{"1"},
+                    Utils.getPreferredSortOrder(getActivity().getBaseContext()));
+
+            if(c == null || c.getCount() == 0){
+                emptyView.setVisibility(View.VISIBLE);
+            }else{
+                emptyView.setVisibility(View.GONE);
+            }
+
+            movieListingAdapter.swapCursor(c);
+
+        }else{
+            c = getActivity().getBaseContext().getContentResolver()
+                    .query(MoviesContract.MovieEntry.CONTENT_URI,
+                            null,
+                            null,
+                            null,
+                            Utils.getPreferredSortOrder(getActivity().getBaseContext()));
+
+            if(c == null || c.getCount() == 0){
+                emptyView.setVisibility(View.VISIBLE);
+            }else{
+                emptyView.setVisibility(View.GONE);
+            }
+
+            movieListingAdapter.swapCursor(c);
+
+        }
     }
 
 }
