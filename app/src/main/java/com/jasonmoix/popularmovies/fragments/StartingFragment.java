@@ -13,7 +13,6 @@ import com.jasonmoix.popularmovies.R;
  * Created by jmoix on 7/24/2015.
  */
 public class StartingFragment extends Fragment {
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

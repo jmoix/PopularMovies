@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -48,7 +49,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.d("Popular Movies", "onPerformSync Called.");
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -124,8 +124,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         final String BACKDROP = "backdrop_path";
         final String POSTER = "poster_path";
 
-        ArrayList<Integer> ids_inserted = new ArrayList<>();
-
         try{
 
             JSONObject moviesJSON = new JSONObject(moviesJsonStr);
@@ -155,7 +153,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 movieValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, poster);
                 movieValues.put(MoviesContract.MovieEntry.COLUMN_FAVORITE, 0);
 
-                ids_inserted.add(id);
                 cVVector.add(movieValues);
             }
 
@@ -163,7 +160,10 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
             if( cVVector.size() > 0){
                 //delete old data
-                mContext.getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI,null,null);
+                mContext.getContentResolver().delete(
+                        MoviesContract.MovieEntry.CONTENT_URI,
+                        MoviesContract.MovieEntry.COLUMN_FAVORITE + " =?",
+                        new String[]{"0"});
                 mContext.getContentResolver().delete(MoviesContract.ReviewEntry.CONTENT_URI,null,null);
                 mContext.getContentResolver().delete(MoviesContract.VideoEntry.CONTENT_URI,null,null);
                 //add new data
@@ -173,12 +173,20 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
             }
 
-            for(int i = 0; i < ids_inserted.size(); i++){
-                getReviews(ids_inserted.get(i));
-                getVideos(ids_inserted.get(i));
+            Cursor c = mContext.getContentResolver().query(
+                    MoviesContract.MovieEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            while(c.moveToNext()){
+                getReviews(c.getInt(c.getColumnIndex(MoviesContract.MovieEntry._ID)));
+                getVideos(c.getInt(c.getColumnIndex(MoviesContract.MovieEntry._ID)));
             }
 
-            Log.d("Popular Movies", "Sync Finished - " + Integer.toString(inserted) + " records inserted!");
+            c.close();
 
         }catch (JSONException e){
             e.printStackTrace();
@@ -191,8 +199,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         final String AUTHOR = "author";
         final String CONTENT = "content";
         final String URL = "url";
-
-        Log.d("Popular Movies", "Review JSON =" + jsonString);
 
         try{
 
@@ -227,8 +233,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 inserted = mContext.getContentResolver().bulkInsert(MoviesContract.ReviewEntry.CONTENT_URI, cvArray);
 
             }
-
-            Log.d("Popular Movies", "Sync Finished - " + Integer.toString(inserted) + " records inserted!");
 
         }catch (JSONException e){
             e.printStackTrace();
@@ -282,8 +286,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         final String SIZE = "size";
         final String TYPE = "type";
 
-        Log.d("Popular Movies", "Video JSON =" + jsonString);
-
         try{
 
             JSONObject object = new JSONObject(jsonString);
@@ -323,8 +325,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 inserted = mContext.getContentResolver().bulkInsert(MoviesContract.VideoEntry.CONTENT_URI, cvArray);
 
             }
-
-            Log.d("Popular Movies", "Sync Finished - " + Integer.toString(inserted) + " records inserted!");
 
         }catch (JSONException e){
             e.printStackTrace();
