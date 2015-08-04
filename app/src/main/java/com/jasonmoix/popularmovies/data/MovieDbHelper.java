@@ -3,13 +3,14 @@ package com.jasonmoix.popularmovies.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Movie;
 
 /**
  * Created by jmoix on 7/16/2015.
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public static final String DATABASE_NAME = "movies.db";
 
@@ -28,7 +29,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MoviesContract.MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL," +
                 MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL," +
                 MoviesContract.MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL," +
-                MoviesContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL" +
+                MoviesContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
+                MoviesContract.MovieEntry.COLUMN_FAVORITE + " INTEGER NOT NULL" +
                 " );";
 
         final String SQL_CREATE_REVIEWS_TABLE = "CREATE TABLE " + MoviesContract.ReviewEntry.TABLE_NAME + " (" +

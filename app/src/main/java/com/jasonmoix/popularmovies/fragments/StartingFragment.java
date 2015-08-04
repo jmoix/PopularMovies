@@ -1,4 +1,4 @@
-package com.jasonmoix.popularmovies;
+package com.jasonmoix.popularmovies.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.jasonmoix.popularmovies.R;
 
 /**
  * Created by jmoix on 7/24/2015.

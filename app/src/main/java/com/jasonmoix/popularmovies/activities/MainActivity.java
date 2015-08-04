@@ -1,11 +1,10 @@
-package com.jasonmoix.popularmovies;
+package com.jasonmoix.popularmovies.activities;
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -13,10 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
 
+import com.jasonmoix.popularmovies.fragments.MovieDetailFragment;
+import com.jasonmoix.popularmovies.fragments.MovieListingFragment;
+import com.jasonmoix.popularmovies.R;
+import com.jasonmoix.popularmovies.fragments.StartingFragment;
+import com.jasonmoix.popularmovies.tools.Utils;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
-
-import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements MovieListingFragment.Callback {

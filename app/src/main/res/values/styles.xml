@@ -16,6 +16,11 @@
 
     </style>
 
+    <style name="tabLayoutStyle" parent="Widget.Design.TabLayout">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="tabIndicatorColor">@color/colorAccent</item>
+    </style>
+
     <style name="toolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:actionMenuTextColor">@color/colorPrimaryDark</item>

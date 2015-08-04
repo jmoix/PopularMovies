@@ -49,8 +49,20 @@
         android:id="@+id/detailPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="?attr/actionBarSize"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/detailTabs"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom"
+        app:layout_anchor="@+id/detailPager"
+        app:layout_anchorGravity="clip_vertical"
+        app:tabTextColor="@android:color/white"
+        app:tabSelectedTextColor="@color/colorAccent"
+        style="@style/tabLayoutStyle"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/favorite"

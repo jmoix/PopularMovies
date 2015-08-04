@@ -1,4 +1,4 @@
-package com.jasonmoix.popularmovies;
+package com.jasonmoix.popularmovies.fragments;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -8,15 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
+
+import com.jasonmoix.popularmovies.R;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.squareup.picasso.Picasso;
 import java.text.ParseException;
@@ -42,7 +41,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             MoviesContract.MovieEntry.COLUMN_OVERVIEW,
             MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE,
             MoviesContract.MovieEntry.COLUMN_POPULARITY,
-            MoviesContract.MovieEntry.COLUMN_RELEASE_DATE
+            MoviesContract.MovieEntry.COLUMN_RELEASE_DATE,
+            MoviesContract.MovieEntry.COLUMN_FAVORITE
     };
 
     private static final String[] REVIEW_COLUMNS = {
@@ -61,6 +61,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     public static final int COL_MOVIE_VOTE = 5;
     public static final int COL_MOVIE_POPULARITY = 6;
     public static final int COL_MOVIE_RELEASE = 7;
+    public static final int COL_FAVORITE = 8;
 
     public static final int COL_REVIEW_ID = 0;
     public static final int COL_REVIEW_MOVIE_ID = 1;
@@ -75,6 +76,10 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private TextView rating;
     private TextView overview;
     private Uri mUri;
+
+    public interface ActivityToFragment{
+        void setFab(int drawableId);
+    }
 
     public static MovieDetailFragment newInstance(Bundle arguments){
         MovieDetailFragment fragment = new MovieDetailFragment();
@@ -158,6 +163,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                     formatDate(releaseInfo)));
             rating.setText(getString(R.string.movie_rating, ratingInfo));
             overview.setText(overviewInfo);
+
+            int favorite = data.getInt(data.getColumnIndex(MoviesContract.MovieEntry.COLUMN_FAVORITE));
+            if(favorite == 0) ((ActivityToFragment)getActivity()).setFab(R.drawable.ic_favorite_border_white_24dp);
+            else ((ActivityToFragment)getActivity()).setFab(R.drawable.ic_favorite_white_24dp);
+
         }
     }
 

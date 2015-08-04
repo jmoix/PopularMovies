@@ -153,6 +153,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 movieValues.put(MoviesContract.MovieEntry.COLUMN_POPULARITY, popularity);
                 movieValues.put(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, backdrop);
                 movieValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, poster);
+                movieValues.put(MoviesContract.MovieEntry.COLUMN_FAVORITE, 0);
 
                 ids_inserted.add(id);
                 cVVector.add(movieValues);
@@ -165,7 +166,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 mContext.getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI,null,null);
                 mContext.getContentResolver().delete(MoviesContract.ReviewEntry.CONTENT_URI,null,null);
                 mContext.getContentResolver().delete(MoviesContract.VideoEntry.CONTENT_URI,null,null);
-
                 //add new data
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);

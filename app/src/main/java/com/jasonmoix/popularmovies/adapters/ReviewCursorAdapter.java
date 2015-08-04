@@ -1,4 +1,4 @@
-package com.jasonmoix.popularmovies;
+package com.jasonmoix.popularmovies.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jasonmoix.popularmovies.R;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.squareup.picasso.Picasso;
 

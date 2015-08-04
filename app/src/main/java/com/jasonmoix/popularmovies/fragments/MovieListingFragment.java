@@ -1,4 +1,4 @@
-package com.jasonmoix.popularmovies;
+package com.jasonmoix.popularmovies.fragments;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -8,17 +8,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
-import com.jasonmoix.popularmovies.data.MoviesContract;
-import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
 
-import java.util.ArrayList;
+import com.jasonmoix.popularmovies.adapters.MovieListingAdapter;
+import com.jasonmoix.popularmovies.R;
+import com.jasonmoix.popularmovies.tools.Utils;
+import com.jasonmoix.popularmovies.data.MoviesContract;
 
 /**
  * Created by jmoix on 7/15/2015.
@@ -34,14 +34,14 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     private static final String POPULARITY_CASE = "Popularity DESC";
     private static final String RATING_CASE = "Vote_Average DESC";
 
-    static final int COL_ID = 0;
-    static final int COL_BACKDROP_URL = 1;
-    static final int COL_POSTER_URL = 2;
-    static final int COL_TITLE = 3;
-    static final int COL_OVERVIEW = 4;
-    static final int COL_VOTE = 5;
-    static final int COL_POPULARITY = 6;
-    static final int COL_RELEASE_DATE = 7;
+    public static final int COL_ID = 0;
+    public static final int COL_BACKDROP_URL = 1;
+    public static final int COL_POSTER_URL = 2;
+    public static final int COL_TITLE = 3;
+    public static final int COL_OVERVIEW = 4;
+    public static final int COL_VOTE = 5;
+    public static final int COL_POPULARITY = 6;
+    public static final int COL_RELEASE_DATE = 7;
 
 
     public Uri getFirstMovieInfo(){

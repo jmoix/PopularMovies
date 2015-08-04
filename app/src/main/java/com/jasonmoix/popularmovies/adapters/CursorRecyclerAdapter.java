@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.jasonmoix.popularmovies;
+package com.jasonmoix.popularmovies.adapters;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -52,7 +52,6 @@ public abstract class CursorRecyclerAdapter<VH extends RecyclerView.ViewHolder> 
         if (!mCursor.moveToPosition(position)) {
             throw new IllegalStateException("couldn't move cursor to position " + position);
         }
-        Log.d("Popular Movies", "onBindViewHolder Called");
         onBindViewHolder(holder, mCursor);
     }
 
@@ -65,12 +64,8 @@ public abstract class CursorRecyclerAdapter<VH extends RecyclerView.ViewHolder> 
     @Override
     public int getItemCount () {
         if (mDataValid && mCursor != null) {
-            Log.d("Popular Movies", "Data Valid and Cursor Not Null");
             return mCursor.getCount();
         } else {
-            if(!mDataValid)
-            Log.d("Popular Movies", "Data Invalid");
-            else Log.d("Popular Movies", "Cursor Null");
             return 0;
         }
     }
@@ -112,25 +107,19 @@ public abstract class CursorRecyclerAdapter<VH extends RecyclerView.ViewHolder> 
      * Cursor, null is also returned.
      */
     public Cursor swapCursor(Cursor newCursor) {
-        Log.d("Popular Movies","Initiating Swap");
         if (newCursor == mCursor) {
-            Log.d("Popular Movies","Cursor is same as current cursor");
             return null;
         }
         Cursor oldCursor = mCursor;
         int itemCount = getItemCount();
-        Log.d("Popular Movies","Old Cursor item count is " + itemCount);
         mCursor = newCursor;
 
         if (newCursor != null) {
-            Log.d("Popular Movies", "New Cursor not Null");
             mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
-            Log.d("Popular Movies", "id column = " + Integer.toString(mRowIDColumn));
             mDataValid = true;
             // notify the observers about the new cursor
             notifyDataSetChanged();
         } else {
-            Log.d("Popular Movies", "New Cursor Null");
             mRowIDColumn = -1;
             mDataValid = false;
             // notify the observers about the lack of a data set

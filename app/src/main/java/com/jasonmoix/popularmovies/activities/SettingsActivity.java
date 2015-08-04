@@ -1,8 +1,6 @@
-package com.jasonmoix.popularmovies;
+package com.jasonmoix.popularmovies.activities;
 
-import android.accounts.Account;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,9 +10,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Toast;
 
-import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
+import com.jasonmoix.popularmovies.R;
 
 /**
  * Created by jmoix on 7/15/2015.

@@ -1,4 +1,4 @@
-package com.jasonmoix.popularmovies;
+package com.jasonmoix.popularmovies.tools;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -5,6 +5,9 @@
 
     <!-- Activity Titles -->
     <string name="title_activity_settings">Settings</string>
+    <string name="title_detail_information">Overview</string>
+    <string name="title_detail_reviews">Reviews</string>
+    <string name="title_detail_videos">Videos</string>
 
     <!-- urls -->
     <string name="base_moviedb_url">http://api.themoviedb.org/3/discover/movie</string>
