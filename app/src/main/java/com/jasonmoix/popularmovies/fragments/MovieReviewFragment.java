@@ -26,7 +26,6 @@ import com.jasonmoix.popularmovies.data.MoviesContract;
  */
 public class MovieReviewFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    private static int mPosition;
     private static int REVIEW_LIST_LOADER = 2;
     private ReviewRecycler reviewRecycler;
     private RecyclerView recyclerView;

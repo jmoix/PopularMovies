@@ -25,7 +25,6 @@ import com.jasonmoix.popularmovies.data.MoviesContract;
  */
 public class MovieVideoFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static int mPosition;
     private static int VIDEO_LIST_LOADER = 3;
     private RecyclerView recyclerView;
     private VideoRecycler videoRecycler;

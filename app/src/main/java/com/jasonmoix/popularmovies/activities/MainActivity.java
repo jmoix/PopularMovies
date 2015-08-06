@@ -253,12 +253,8 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(MovieDetailFragment.DETAIL_URI, uri);
 
-                movieDetailFragment = MovieDetailFragment.newInstance(bundle);
-                movieVideoFragment = MovieVideoFragment.newInstance(bundle);
-                movieReviewFragment = MovieReviewFragment.newInstance(bundle);
-
                 ViewPager viewPager = (ViewPager)findViewById(R.id.movie_detail_container);
-                viewPager.setAdapter(new FragmentPager(((AppCompatActivity)context).getSupportFragmentManager()));
+                viewPager.setAdapter(new FragmentPager(((AppCompatActivity)context).getSupportFragmentManager(), bundle));
                 pageChangeListener = new PageChangeListener();
                 viewPager.addOnPageChangeListener(pageChangeListener);
 
@@ -272,9 +268,13 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
     public class FragmentPager extends FragmentPagerAdapter {
 
+        private Bundle bundle;
 
-        public FragmentPager(FragmentManager fm){
+        public FragmentPager(FragmentManager fm, Bundle bundle){
+
             super(fm);
+            this.bundle = bundle;
+
         }
 
         @Override
@@ -286,10 +286,13 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
+                    movieDetailFragment = MovieDetailFragment.newInstance(bundle);
                     return movieDetailFragment;
                 case 1:
+                    movieReviewFragment = MovieReviewFragment.newInstance(bundle);
                     return movieReviewFragment;
                 case 2:
+                    movieVideoFragment = MovieVideoFragment.newInstance(bundle);
                     return movieVideoFragment;
                 default:
                     return null;
@@ -309,6 +312,10 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                 default:
                     return null;
             }
+        }
+
+        public void setBundle(Bundle bundle){
+            this.bundle = bundle;
         }
 
     }
