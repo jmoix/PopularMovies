@@ -1,34 +1,52 @@
 package com.jasonmoix.popularmovies.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import com.jasonmoix.popularmovies.fragments.MovieDetailFragment;
 import com.jasonmoix.popularmovies.fragments.MovieListingFragment;
 import com.jasonmoix.popularmovies.R;
+import com.jasonmoix.popularmovies.fragments.MovieReviewFragment;
+import com.jasonmoix.popularmovies.fragments.MovieVideoFragment;
 import com.jasonmoix.popularmovies.fragments.StartingFragment;
 import com.jasonmoix.popularmovies.tools.Utils;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.jasonmoix.popularmovies.sync.MoviesSyncAdapter;
 
 
-public class MainActivity extends AppCompatActivity implements MovieListingFragment.Callback {
+public class MainActivity extends AppCompatActivity implements MovieListingFragment.Callback, MovieDetailFragment.ActivityToFragment {
 
     private static final String DETAIL_TAG = "DTAG";
     private String mSortOrder;
 
     public static boolean mTwoPane = false;
     public static boolean showFavorites = false;
+
+    private MovieDetailFragment movieDetailFragment;
+    private MovieReviewFragment movieReviewFragment;
+    private MovieVideoFragment movieVideoFragment;
+    private PageChangeListener pageChangeListener;
+
+    private static Boolean detailRefresh = false;
+    private static Boolean videoRefresh = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         MoviesSyncAdapter.initializeSyncAdapter(this);
 
         mSortOrder = Utils.getPreferredSortOrder(this);
+        detailRefresh = false;
+        videoRefresh  = false;
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -52,15 +72,12 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
             if(savedInstanceState == null){
 
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.movie_detail_container, new StartingFragment())
-                        .commit();
 
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragment_listing, new MovieListingFragment())
                         .commit();
+
             }
 
         } else{
@@ -87,16 +104,29 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         Log.d("Popular Movies", uri.toString());
 
         if(mTwoPane){
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(MovieDetailFragment.DETAIL_URI, uri);
 
-            MovieDetailFragment detailFragment = new MovieDetailFragment();
-            detailFragment.setArguments(bundle);
+            int pos = ((ViewPager)findViewById(R.id.movie_detail_container)).getCurrentItem();
+            Log.d("Popular Movies", "Position = " + pos);
+            switch (pos){
+                case 0:
+                    movieDetailFragment.reloadData(uri);
+                    movieReviewFragment.reloadData(uri);
+                    videoRefresh = true;
+                    break;
+                case 1:
+                    movieDetailFragment.reloadData(uri);
+                    movieReviewFragment.reloadData(uri);
+                    movieVideoFragment.reloadData(uri);
+                    break;
+                case 2:
+                    detailRefresh = true;
+                    movieReviewFragment.reloadData(uri);
+                    movieVideoFragment.reloadData(uri);
+                    break;
+            }
+            pageChangeListener.setUri(uri);
+            Log.d("Popular Movies", "Item clicked in two pane");
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.movie_detail_container, detailFragment)
-                    .commit();
         }else {
             Intent i = new Intent(this, DetailActivity.class);
             i.putExtra(MovieDetailFragment.DETAIL_URI, uri);
@@ -159,16 +189,33 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
             mSortOrder = sortby;
         }
         if(mTwoPane) {
+            //Detail Frag
             if (MovieListingFragment.mPosition != GridView.INVALID_POSITION && resort == false)
-                new getFirstMovieTask().execute(MovieListingFragment.mPosition);
+                new getFirstMovieTask(this).execute(MovieListingFragment.mPosition);
             else {
                 resort = false;
-                new getFirstMovieTask().execute(0);
+                new getFirstMovieTask(this).execute(0);
             }
         }
     }
 
+    public void favorite(View view){
+
+    }
+
+    public void setFab(int drawableId){
+        if(mTwoPane){
+            ((FloatingActionButton)findViewById(R.id.favorite)).setImageResource(drawableId);
+        }
+    }
+
     private class getFirstMovieTask extends AsyncTask<Integer, Void, Uri>{
+
+        private Context context;
+
+        public getFirstMovieTask(Context context){
+            this.context = context;
+        }
 
         @Override
         protected Uri doInBackground(Integer... params) {
@@ -202,15 +249,144 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(MovieDetailFragment.DETAIL_URI, uri);
 
-                MovieDetailFragment detailFragment = new MovieDetailFragment();
-                detailFragment.setArguments(bundle);
+                movieDetailFragment = MovieDetailFragment.newInstance(bundle);
+                movieVideoFragment = MovieVideoFragment.newInstance(bundle);
+                movieReviewFragment = MovieReviewFragment.newInstance(bundle);
 
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.movie_detail_container, detailFragment)
-                        .commit();
+                ViewPager viewPager = (ViewPager)findViewById(R.id.movie_detail_container);
+                viewPager.setAdapter(new FragmentPager(((AppCompatActivity)context).getSupportFragmentManager()));
+                pageChangeListener = new PageChangeListener();
+                viewPager.addOnPageChangeListener(pageChangeListener);
+
+                ((TabLayout)findViewById(R.id.detailTabs)).setupWithViewPager(viewPager);
+
+                new GetFavoriteTask(context).execute(uri.toString());
             }
         }
+    }
+
+    public class FragmentPager extends FragmentPagerAdapter {
+
+
+        public FragmentPager(FragmentManager fm){
+            super(fm);
+        }
+
+        @Override
+        public int getCount() {
+            return DetailActivity.NUM_PAGES;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position){
+                case 0:
+                    return movieDetailFragment;
+                case 1:
+                    return movieReviewFragment;
+                case 2:
+                    return movieVideoFragment;
+                default:
+                    return null;
+            }
+
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position){
+                case 0:
+                    return getString(R.string.title_detail_information);
+                case 1:
+                    return getString(R.string.title_detail_reviews);
+                case 2:
+                    return getString(R.string.title_detail_videos);
+                default:
+                    return null;
+            }
+        }
+
+    }
+
+    private class PageChangeListener implements ViewPager.OnPageChangeListener {
+
+        private Uri uri;
+
+        @Override
+        public void onPageScrollStateChanged(int state) {}
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+        @Override
+        public void onPageSelected(int position) {
+
+            switch (position){
+                case 0:
+                    if(detailRefresh){
+                        movieDetailFragment.reloadData(uri);
+                        detailRefresh = false;
+                    }
+                    break;
+                case 2:
+                    if(videoRefresh){
+                        movieVideoFragment.reloadData(uri);
+                        videoRefresh = false;
+                    }
+                    break;
+            }
+
+        }
+
+        public void setUri(Uri uri){
+            this.uri = uri;
+        }
+
+    }
+
+    private class GetFavoriteTask extends AsyncTask<String, Void, Integer>{
+
+        private Context context;
+
+        public GetFavoriteTask(Context context){
+            this.context = context;
+        }
+
+        @Override
+        protected Integer doInBackground(String... params) {
+
+            Uri uri = Uri.parse(params[0]);
+            int favorite = 0;
+
+            Cursor cursor = context.getContentResolver().query(
+                    uri,
+                    null,
+                    MoviesContract.MovieEntry._ID + " =?",
+                    new String[]{MoviesContract.MovieEntry.getMovieIdFromURI(uri)},
+                    null
+            );
+
+            if(cursor != null){
+                cursor.moveToFirst();
+                favorite = cursor.getInt(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_FAVORITE));
+                Log.d("Popular Movies", "Favorite = " + favorite);
+                cursor.close();
+            }
+
+            return favorite;
+
+        }
+
+        @Override
+        protected void onPostExecute(Integer favorite) {
+            super.onPostExecute(favorite);
+            if(favorite == 0) setFab(R.drawable.ic_favorite_border_white_24dp);
+            else setFab(R.drawable.ic_favorite_white_24dp);
+            if(findViewById(R.id.favorite).getVisibility() == View.GONE){
+                findViewById(R.id.favorite).setVisibility(View.VISIBLE);
+            }
+        }
+
     }
 
 }

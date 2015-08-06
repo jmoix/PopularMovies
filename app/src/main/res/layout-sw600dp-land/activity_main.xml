@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -25,12 +26,40 @@
             android:layout_height="match_parent"
             android:layout_weight="1"/>
 
-        <FrameLayout
-            android:id="@+id/movie_detail_container"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/detailTabs"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="bottom"
+                app:tabTextColor="@android:color/white"
+                app:tabSelectedTextColor="@color/colorAccent"
+                style="@style/tabLayoutStyle"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/movie_detail_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
 
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/favorite"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_favorite_border_white_24dp"
+        android:clickable="true"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:visibility="gone"
+        android:onClick="favorite"/>
 
 </RelativeLayout>

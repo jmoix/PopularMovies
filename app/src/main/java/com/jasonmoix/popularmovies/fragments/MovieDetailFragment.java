@@ -173,6 +173,12 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    public void reloadData(Uri uri){
+        mUri = uri;
+        getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
     }
 
 }

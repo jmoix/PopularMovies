@@ -35,7 +35,7 @@ import com.jasonmoix.popularmovies.data.MoviesContract;
  */
 public class DetailActivity extends AppCompatActivity implements MovieDetailFragment.ActivityToFragment {
 
-    private final int NUM_PAGES = 3;
+    public static final int NUM_PAGES = 3;
     public static final int DETAIL_RESULT = 100;
 
     private FloatingActionButton favoriteFab;
@@ -140,7 +140,7 @@ public class DetailActivity extends AppCompatActivity implements MovieDetailFrag
         }
     }
 
-    private class AlterFavoriteTask extends AsyncTask<String, Void, Boolean> {
+    public class AlterFavoriteTask extends AsyncTask<String, Void, Boolean> {
 
         private Context context;
 

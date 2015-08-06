@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jasonmoix.popularmovies.R;
+import com.jasonmoix.popularmovies.activities.DetailActivity;
 import com.jasonmoix.popularmovies.adapters.ReviewRecycler;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 
@@ -31,6 +32,7 @@ public class MovieReviewFragment extends Fragment implements LoaderManager.Loade
     private RecyclerView recyclerView;
     private TextView emptyView;
     private CardView cardView;
+    private Uri mUri;
 
     public static MovieReviewFragment newInstance(Bundle bundle){
 
@@ -57,7 +59,7 @@ public class MovieReviewFragment extends Fragment implements LoaderManager.Loade
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(reviewRecycler);
 
-
+        mUri = getArguments().getParcelable(MovieDetailFragment.DETAIL_URI);
         emptyView = (TextView)rootView.findViewById(R.id.no_items);
         cardView = (CardView)rootView.findViewById(R.id.no_items_view);
 
@@ -68,16 +70,17 @@ public class MovieReviewFragment extends Fragment implements LoaderManager.Loade
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        Uri mUri = getArguments().getParcelable(MovieDetailFragment.DETAIL_URI);
+        if(mUri != null) {
 
-        return new CursorLoader(getActivity(),
-                MoviesContract.ReviewEntry.CONTENT_URI,
-                null,
-                MoviesContract.ReviewEntry.COLUMN_MOVIE_ID + " =?",
-                new String[]{MoviesContract.MovieEntry.getMovieIdFromURI(mUri)},
-                null);
+            return new CursorLoader(getActivity(),
+                    MoviesContract.ReviewEntry.CONTENT_URI,
+                    null,
+                    MoviesContract.ReviewEntry.COLUMN_MOVIE_ID + " =?",
+                    new String[]{MoviesContract.MovieEntry.getMovieIdFromURI(mUri)},
+                    null);
+        }
 
-
+        return null;
     }
 
     @Override
@@ -95,4 +98,10 @@ public class MovieReviewFragment extends Fragment implements LoaderManager.Loade
     public void onLoaderReset(Loader<Cursor> loader) {
         reviewRecycler.swapCursor(null);
     }
+
+    public void reloadData(Uri uri){
+        mUri = uri;
+        getLoaderManager().restartLoader(REVIEW_LIST_LOADER, null, this);
+    }
+
 }

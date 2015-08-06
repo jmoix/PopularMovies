@@ -31,6 +31,7 @@ public class MovieVideoFragment extends Fragment implements LoaderManager.Loader
     private VideoRecycler videoRecycler;
     private TextView emptyView;
     private CardView cardView;
+    private Uri mUri;
 
     public static MovieVideoFragment newInstance(Bundle bundle){
         MovieVideoFragment fragment = new MovieVideoFragment();
@@ -55,6 +56,8 @@ public class MovieVideoFragment extends Fragment implements LoaderManager.Loader
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(videoRecycler);
 
+        mUri = getArguments().getParcelable(MovieDetailFragment.DETAIL_URI);
+
         emptyView = (TextView)rootView.findViewById(R.id.no_items);
         cardView = (CardView)rootView.findViewById(R.id.no_items_view);
 
@@ -64,14 +67,16 @@ public class MovieVideoFragment extends Fragment implements LoaderManager.Loader
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        Uri mUri = getArguments().getParcelable(MovieDetailFragment.DETAIL_URI);
+        if(mUri != null) {
+            return new CursorLoader(getActivity(),
+                    MoviesContract.VideoEntry.CONTENT_URI,
+                    null,
+                    MoviesContract.VideoEntry.COLUMN_MOVIE_ID + " =?",
+                    new String[]{MoviesContract.MovieEntry.getMovieIdFromURI(mUri)},
+                    null);
+        }
+        return null;
 
-        return new CursorLoader(getActivity(),
-                MoviesContract.VideoEntry.CONTENT_URI,
-                null,
-                MoviesContract.VideoEntry.COLUMN_MOVIE_ID + " =?",
-                new String[]{MoviesContract.MovieEntry.getMovieIdFromURI(mUri)},
-                null);
     }
 
     @Override
@@ -88,5 +93,10 @@ public class MovieVideoFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         videoRecycler.swapCursor(null);
+    }
+
+    public void reloadData(Uri uri){
+        mUri = uri;
+        getLoaderManager().restartLoader(VIDEO_LIST_LOADER, null, this);
     }
 }
