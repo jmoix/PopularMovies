@@ -1,5 +1,6 @@
 package com.jasonmoix.popularmovies.activities;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
     private static Boolean detailRefresh = false;
     private static Boolean videoRefresh = false;
+    private static String currentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                     break;
             }
             pageChangeListener.setUri(uri);
+            currentId = MoviesContract.MovieEntry.getMovieIdFromURI(uri);
+            new GetFavoriteTask(this).execute(uri.toString());
             Log.d("Popular Movies", "Item clicked in two pane");
 
         }else {
@@ -200,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     }
 
     public void favorite(View view){
-
+        new AlterFavoriteTask(this).execute(currentId);
     }
 
     public void setFab(int drawableId){
@@ -260,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
                 ((TabLayout)findViewById(R.id.detailTabs)).setupWithViewPager(viewPager);
 
+                currentId = MoviesContract.MovieEntry.getMovieIdFromURI(uri);
                 new GetFavoriteTask(context).execute(uri.toString());
             }
         }
@@ -387,6 +392,80 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
             }
         }
 
+    }
+
+    public class AlterFavoriteTask extends AsyncTask<String, Void, Boolean> {
+
+        private Context context;
+
+        public AlterFavoriteTask(Context context){
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+
+            boolean favorite = false;
+            String movieId = params[0];
+            Log.d("Popular Movies", "ID = " + movieId);
+
+            Cursor cursor = context.getContentResolver().query(
+                    MoviesContract.MovieEntry.CONTENT_URI,
+                    null,
+                    MoviesContract.MovieEntry._ID + " =?",
+                    new String[]{movieId},
+                    null
+            );
+
+            Log.d("Popular Movies", "Cursor Count = " + cursor.getCount());
+
+            cursor.moveToFirst();
+            int isFavorite = cursor.getInt(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_FAVORITE));
+
+            cursor.close();
+
+            ContentValues values;
+
+            switch (isFavorite){
+                case 0:
+                    values = new ContentValues();
+                    values.put(MoviesContract.MovieEntry.COLUMN_FAVORITE, 1);
+                    context.getContentResolver().update(
+                            MoviesContract.MovieEntry.CONTENT_URI,
+                            values,
+                            MoviesContract.MovieEntry._ID + " =?",
+                            new String[]{movieId}
+                    );
+                    break;
+                case 1:
+                    values = new ContentValues();
+                    values.put(MoviesContract.MovieEntry.COLUMN_FAVORITE, 0);
+                    context.getContentResolver().update(
+                            MoviesContract.MovieEntry.CONTENT_URI,
+                            values,
+                            MoviesContract.MovieEntry._ID + " =?",
+                            new String[]{movieId}
+                    );
+                    favorite = true;
+                    break;
+                default:
+                    break;
+            }
+
+            return favorite;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+
+            if(aBoolean){
+                setFab(R.drawable.ic_favorite_white_24dp);
+            }
+            else{
+                setFab(R.drawable.ic_favorite_border_white_24dp);
+            }
+
+        }
     }
 
 }
