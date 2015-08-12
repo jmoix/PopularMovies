@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         super.onResume();
         Log.d("Popular Movies", "OnResume");
 
+        MoviesSyncAdapter.syncImmediately(this);
         String sortby = Utils.getPreferredSortOrder(this);
         Boolean resort = false;
         if(sortby != null & !sortby.equals(mSortOrder)){
