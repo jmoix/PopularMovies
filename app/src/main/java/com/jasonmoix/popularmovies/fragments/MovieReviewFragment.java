@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.jasonmoix.popularmovies.R;
 import com.jasonmoix.popularmovies.activities.DetailActivity;
+import com.jasonmoix.popularmovies.activities.MainActivity;
 import com.jasonmoix.popularmovies.adapters.ReviewRecycler;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 
@@ -33,12 +34,8 @@ public class MovieReviewFragment extends Fragment implements LoaderManager.Loade
     private CardView cardView;
     private Uri mUri;
 
-    public static MovieReviewFragment newInstance(Bundle bundle){
-
-        MovieReviewFragment fragment = new MovieReviewFragment();
-        fragment.setArguments(bundle);
-        return(fragment);
-
+    public static MovieReviewFragment newInstance(){
+        return new MovieReviewFragment();
     }
 
     @Override
@@ -58,7 +55,7 @@ public class MovieReviewFragment extends Fragment implements LoaderManager.Loade
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(reviewRecycler);
 
-        mUri = getArguments().getParcelable(MovieDetailFragment.DETAIL_URI);
+        mUri = MainActivity.mUri;
         emptyView = (TextView)rootView.findViewById(R.id.no_items);
         cardView = (CardView)rootView.findViewById(R.id.no_items_view);
 
@@ -96,11 +93,6 @@ public class MovieReviewFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         reviewRecycler.swapCursor(null);
-    }
-
-    public void reloadData(Uri uri){
-        mUri = uri;
-        getLoaderManager().restartLoader(REVIEW_LIST_LOADER, null, this);
     }
 
 }

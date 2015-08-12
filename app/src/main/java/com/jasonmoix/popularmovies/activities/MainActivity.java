@@ -99,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
         Log.d("Popular Movies", uri.toString());
 
+        mUri = uri;
+
         if(mTwoPane){
 
             Bundle args = new Bundle();
@@ -110,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
         }else {
             Intent i = new Intent(this, DetailActivity.class);
-            i.putExtra(MovieDetailFragment.DETAIL_URI, uri);
             i.putExtra(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, backdropUri);
             i.putExtra(MoviesContract.MovieEntry.COLUMN_TITLE, title);
             startActivityForResult(i, position);

@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jasonmoix.popularmovies.R;
+import com.jasonmoix.popularmovies.activities.MainActivity;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 import com.squareup.picasso.Picasso;
 import java.text.ParseException;
@@ -81,10 +82,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         void setFab(int drawableId);
     }
 
-    public static MovieDetailFragment newInstance(Bundle arguments){
-        MovieDetailFragment fragment = new MovieDetailFragment();
-        fragment.setArguments(arguments);
-        return(fragment);
+    public static MovieDetailFragment newInstance(){
+        return new MovieDetailFragment();
     }
 
     @Nullable
@@ -92,7 +91,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
-        mUri = getArguments().getParcelable(DETAIL_URI);
+        mUri = MainActivity.mUri;
         Log.d("URI", mUri.toString());
         poster = (ImageView)rootView.findViewById(R.id.movie_poster);
         title = (TextView) rootView.findViewById(R.id.movie_title);
@@ -175,11 +174,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-    }
-
-    public void reloadData(Uri uri){
-        mUri = uri;
-        getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
     }
 
 }

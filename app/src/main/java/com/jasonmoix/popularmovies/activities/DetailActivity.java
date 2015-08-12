@@ -42,8 +42,7 @@ public class DetailActivity extends AppCompatActivity implements MovieDetailFrag
 
     public void favorite(View view){
 
-        Uri movieUri = getIntent().getParcelableExtra(MovieDetailFragment.DETAIL_URI);
-        String[] movieId = new String[]{MoviesContract.MovieEntry.getMovieIdFromURI(movieUri)};
+        String[] movieId = new String[]{MoviesContract.MovieEntry.getMovieIdFromURI(MainActivity.mUri)};
 
         new AlterFavoriteTask(this).execute(movieId);
     }
@@ -54,8 +53,6 @@ public class DetailActivity extends AppCompatActivity implements MovieDetailFrag
         setContentView(R.layout.activity_movie_detail);
 
         setResult(DETAIL_RESULT, new Intent());
-
-        CoordinatorLayout rootLayout = (CoordinatorLayout)findViewById(R.id.main_content);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_chevron_left_white_24dp));
@@ -114,11 +111,11 @@ public class DetailActivity extends AppCompatActivity implements MovieDetailFrag
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    return MovieDetailFragment.newInstance(getIntent().getExtras());
+                    return MovieDetailFragment.newInstance();
                 case 1:
-                    return MovieReviewFragment.newInstance(getIntent().getExtras());
+                    return MovieReviewFragment.newInstance();
                 case 2:
-                    return MovieVideoFragment.newInstance(getIntent().getExtras());
+                    return MovieVideoFragment.newInstance();
                 default:
                     return null;
             }

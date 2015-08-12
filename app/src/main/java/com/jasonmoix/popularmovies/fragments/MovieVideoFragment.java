@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jasonmoix.popularmovies.R;
+import com.jasonmoix.popularmovies.activities.MainActivity;
 import com.jasonmoix.popularmovies.adapters.VideoRecycler;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 
@@ -32,10 +33,8 @@ public class MovieVideoFragment extends Fragment implements LoaderManager.Loader
     private CardView cardView;
     private Uri mUri;
 
-    public static MovieVideoFragment newInstance(Bundle bundle){
-        MovieVideoFragment fragment = new MovieVideoFragment();
-        fragment.setArguments(bundle);
-        return(fragment);
+    public static MovieVideoFragment newInstance(){
+        return new MovieVideoFragment();
     }
 
     @Override
@@ -55,7 +54,7 @@ public class MovieVideoFragment extends Fragment implements LoaderManager.Loader
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(videoRecycler);
 
-        mUri = getArguments().getParcelable(MovieDetailFragment.DETAIL_URI);
+        mUri = MainActivity.mUri;
 
         emptyView = (TextView)rootView.findViewById(R.id.no_items);
         cardView = (CardView)rootView.findViewById(R.id.no_items_view);
@@ -92,10 +91,5 @@ public class MovieVideoFragment extends Fragment implements LoaderManager.Loader
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         videoRecycler.swapCursor(null);
-    }
-
-    public void reloadData(Uri uri){
-        mUri = uri;
-        getLoaderManager().restartLoader(VIDEO_LIST_LOADER, null, this);
     }
 }
