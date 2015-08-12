@@ -18,6 +18,7 @@
         android:layout_below="@id/toolbar"
         tools:context="com.jasonmoix.popularmovies.activities.MainActivity"/>
 
+
 </RelativeLayout>
 
 

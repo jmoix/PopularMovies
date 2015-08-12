@@ -46,14 +46,8 @@ public class MovieListingFragment extends Fragment implements LoaderManager.Load
     public static final int COL_RELEASE_DATE = 7;
 
 
-    public Uri getFirstMovieInfo(){
-
-        Cursor movieCursor = movieListingAdapter.getCursor();
-        movieCursor.moveToFirst();
-        Uri movieUri = MoviesContract.MovieEntry.buildMovieLocationWithId(
-                movieCursor.getString(COL_ID));
-        return(movieUri);
-
+    public static MovieListingFragment newInstance(){
+        return new MovieListingFragment();
     }
 
     public interface Callback {

@@ -110,6 +110,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         getLoaderManager().initLoader(DETAIL_LOADER, null, this);
     }
 
+
     public String formatDate(String date){
 
         Calendar newDate = new GregorianCalendar(Calendar.getInstance().getTimeZone());
