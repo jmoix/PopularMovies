@@ -22,6 +22,8 @@ import com.jasonmoix.popularmovies.activities.MainActivity;
 import com.jasonmoix.popularmovies.adapters.ReviewRecycler;
 import com.jasonmoix.popularmovies.data.MoviesContract;
 
+import org.solovyev.android.views.llm.DividerItemDecoration;
+
 /**
  * Created by jmoix on 7/30/2015.
  */
@@ -51,9 +53,17 @@ public class MovieReviewFragment extends Fragment implements LoaderManager.Loade
         reviewRecycler = new ReviewRecycler(getActivity().getBaseContext(), null);
         View rootView = inflater.inflate(R.layout.fragment_movie_reviews, container, false);
 
+        final LinearLayoutManager layoutManager =
+                new org.solovyev.android.views.llm.LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+
         recyclerView = (RecyclerView)rootView.findViewById(R.id.scrollView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), null));
         recyclerView.setAdapter(reviewRecycler);
+
+        if(MainActivity.mTwoPane) {
+            ((TextView) rootView.findViewById(R.id.header)).setText(getString(R.string.title_detail_reviews));
+        }
 
         mUri = MainActivity.mUri;
         emptyView = (TextView)rootView.findViewById(R.id.no_items);

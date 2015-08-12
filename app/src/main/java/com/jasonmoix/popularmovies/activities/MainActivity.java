@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.jasonmoix.popularmovies.fragments.MovieDetailFragment;
@@ -73,6 +74,29 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
                         .replace(R.id.fragment_listing, MovieListingFragment.newInstance())
                         .commit();
 
+                if(mUri != null){
+
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.detail_fragment, MovieDetailFragment.newInstance())
+                            .commit();
+
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.review_fragment, MovieReviewFragment.newInstance())
+                            .commit();
+
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.video_fragment, MovieVideoFragment.newInstance())
+                            .commit();
+
+                    String movieId = MoviesContract.MovieEntry.getMovieIdFromURI(mUri);
+
+                    new IsFavoriteTask(this).execute(movieId);
+
+                }
+
 
             }
 
@@ -103,12 +127,24 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
 
         if(mTwoPane){
 
-            Bundle args = new Bundle();
-            args.putParcelable(MovieDetailFragment.DETAIL_URI, uri);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.detail_fragment, MovieDetailFragment.newInstance())
+                    .commit();
 
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.review_fragment, MovieReviewFragment.newInstance())
+                    .commit();
 
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.video_fragment, MovieVideoFragment.newInstance())
+                    .commit();
 
+            String movieId = MoviesContract.MovieEntry.getMovieIdFromURI(mUri);
 
+            new IsFavoriteTask(this).execute(movieId);
 
         }else {
             Intent i = new Intent(this, DetailActivity.class);
@@ -144,6 +180,11 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == DetailActivity.DETAIL_RESULT) {
             MovieListingFragment mf = (MovieListingFragment)getSupportFragmentManager()
@@ -160,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
         super.onResume();
         Log.d("Popular Movies", "OnResume");
 
-        //MoviesSyncAdapter.syncImmediately(this);
         String sortby = Utils.getPreferredSortOrder(this);
         Boolean resort = false;
         if(sortby != null & !sortby.equals(mSortOrder)){
@@ -172,20 +212,131 @@ public class MainActivity extends AppCompatActivity implements MovieListingFragm
             }
             mSortOrder = sortby;
         }
-        if(mTwoPane) {
 
-
-        }
     }
 
     public void favorite(View view){
+
+        new InvertFavoriteTask(this).execute(MoviesContract.MovieEntry.getMovieIdFromURI(mUri));
 
     }
 
     public void setFab(int drawableId){
         if(mTwoPane){
-            ((FloatingActionButton)findViewById(R.id.favorite)).setImageResource(drawableId);
+
+            FloatingActionButton favoriteButton = ((FloatingActionButton)findViewById(R.id.favorite));
+
+            if(favoriteButton.getVisibility() == View.GONE)
+                favoriteButton.setVisibility(View.VISIBLE);
+
+            favoriteButton.setImageResource(drawableId);
+
         }
+    }
+
+    private class IsFavoriteTask extends AsyncTask<String, Void, Boolean>{
+
+        private Context context;
+
+        public IsFavoriteTask(Context context){
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+
+            String movieId = params[0];
+
+            Cursor cursor = context.getContentResolver().query(
+                    MoviesContract.MovieEntry.CONTENT_URI,
+                    null,
+                    MoviesContract.MovieEntry._ID + " =?",
+                    new String[]{movieId},
+                    null
+            );
+
+            if(cursor != null && cursor.moveToFirst()){
+
+                String isFavorite = cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_FAVORITE));
+                if(isFavorite.equals("1")) return true;
+
+            }
+
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isFavorite) {
+            super.onPostExecute(isFavorite);
+
+            if(isFavorite) setFab(R.drawable.ic_favorite_white_24dp);
+            else setFab(R.drawable.ic_favorite_border_white_24dp);
+
+        }
+
+    }
+
+    private class InvertFavoriteTask extends AsyncTask<String, Void, Boolean>{
+
+        private Context context;
+
+        public InvertFavoriteTask(Context context){
+            this.context = context;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+
+            String movieId = params[0];
+
+            Cursor cursor = context.getContentResolver().query(
+                    MoviesContract.MovieEntry.CONTENT_URI,
+                    null,
+                    MoviesContract.MovieEntry._ID + " =?",
+                    new String[]{movieId},
+                    null
+            );
+
+            if(cursor != null && cursor.moveToFirst()){
+
+                String isFavorite = cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_FAVORITE));
+
+                if(isFavorite.equals("1")){
+                    ContentValues values = new ContentValues();
+                    values.put(MoviesContract.MovieEntry.COLUMN_FAVORITE, 0);
+                    context.getContentResolver().update(
+                            MoviesContract.MovieEntry.CONTENT_URI,
+                            values,
+                            MoviesContract.MovieEntry._ID + " =?",
+                            new String[]{movieId}
+                    );
+                    return false;
+                }
+                else{
+                    ContentValues values = new ContentValues();
+                    values.put(MoviesContract.MovieEntry.COLUMN_FAVORITE, 1);
+                    context.getContentResolver().update(
+                            MoviesContract.MovieEntry.CONTENT_URI,
+                            values,
+                            MoviesContract.MovieEntry._ID + " =?",
+                            new String[]{movieId}
+                    );
+                    return true;
+                }
+
+            }
+
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isFavorite) {
+            super.onPostExecute(isFavorite);
+
+            if(isFavorite) setFab(R.drawable.ic_favorite_white_24dp);
+            else setFab(R.drawable.ic_favorite_border_white_24dp);
+        }
+
     }
 
 }

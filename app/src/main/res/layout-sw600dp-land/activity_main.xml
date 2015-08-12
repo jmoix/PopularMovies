@@ -26,11 +26,47 @@
             android:layout_height="match_parent"
             android:layout_weight="1"/>
 
-        <android.support.v4.view.ViewPager
+        <ScrollView
             android:id="@+id/movie_detail"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/placeholder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/moviedblogo"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="centerCrop"
+                    android:layout_centerHorizontal="true"/>
+
+                <FrameLayout
+                    android:id="@+id/detail_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/placeholder"/>
+
+                <FrameLayout
+                    android:id="@+id/review_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/detail_fragment"/>
+
+                <FrameLayout
+                    android:id="@+id/video_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/review_fragment"/>
+
+
+            </RelativeLayout>
+
+        </ScrollView>
 
     </LinearLayout>
 
